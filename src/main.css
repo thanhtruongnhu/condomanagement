@@ -1,0 +1,15 @@
+* {
+  font-family: "Manrope", sans-serif !important;
+}
+
+a {
+  text-decoration: none !important;
+}
+
+.MuiTable-root {
+  border: 2px solid red; /* Change to your desired border style and color */
+}
+
+.MuiTableCell-root {
+  border: 1px solid blue; /* Change to your desired border style and color */
+}
