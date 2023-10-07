@@ -9,7 +9,7 @@ import Select from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
 import Button from "@mui/material/Button";
 
-import { FormProps } from "../../interfaces/common";
+import { FormProps1 } from "../../interfaces/common";
 import CustomButton from "./CustomButton";
 
 const Form = ({
@@ -20,7 +20,7 @@ const Form = ({
     // formLoading,
     // onFinishHandler,
     propertyImage,
-}: FormProps) => {
+}: FormProps1) => {
     return (
         <Box m="20px">
             <Typography fontSize={25} fontWeight={700} color="#11142d">
@@ -192,7 +192,7 @@ const Form = ({
                                 Upload *
                                 <input
                                     hidden
-                                    accept="image/*"
+                                    accept="*"
                                     type="file"
                                     onChange={(
                                         e: React.ChangeEvent<HTMLInputElement>,

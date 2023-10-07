@@ -209,7 +209,7 @@ const RoomDetails = () => {
             fullWidth
             icon={<Edit />}
             handleClick={() => {
-              navigate(`/properties/edit/${propertyDetails._id}`);
+              navigate(`/rooms/edit/${propertyDetails._id}`);
             }}
           />
         </Box>

@@ -29,6 +29,7 @@ import Applications from "./pages/applications";
 import Inventory from "./pages/inventory";
 import CreateRoom from "./pages/create-room";
 import RoomDetails from "./pages/room-details";
+import EditRoom from "./pages/edit-room";
 
 // function Copyright(props: any) {
 //   return (
@@ -189,6 +190,7 @@ export default function Dashboard() {
               <Route path="/applications" element={<Applications />} />
               <Route path="/rooms/create" element={<CreateRoom/>} />
               <Route path="/rooms/show/:id" element={<RoomDetails/>} />
+              <Route path="/rooms/edit/:id" element={<EditRoom/>} />
 
             </Routes>
           </Box>
