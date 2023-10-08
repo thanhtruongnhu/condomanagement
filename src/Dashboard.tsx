@@ -30,6 +30,8 @@ import Inventory from "./pages/inventory";
 import CreateRoom from "./pages/create-room";
 import RoomDetails from "./pages/room-details";
 import EditRoom from "./pages/edit-room";
+import Inquiries from "./pages/inquiries";
+import Waitlist from "./pages/waitlist";
 
 // function Copyright(props: any) {
 //   return (
@@ -188,10 +190,11 @@ export default function Dashboard() {
               <Route path="/rooms" element={<Rooms />} />
               <Route path="/inventory" element={<Inventory />} />
               <Route path="/applications" element={<Applications />} />
-              <Route path="/rooms/create" element={<CreateRoom/>} />
-              <Route path="/rooms/show/:id" element={<RoomDetails/>} />
-              <Route path="/rooms/edit/:id" element={<EditRoom/>} />
-
+              <Route path="/inquiries" element={<Inquiries />} />
+              <Route path="/waitlist" element={<Waitlist />} />
+              <Route path="/rooms/create" element={<CreateRoom />} />
+              <Route path="/rooms/show/:id" element={<RoomDetails />} />
+              <Route path="/rooms/edit/:id" element={<EditRoom />} />
             </Routes>
           </Box>
         </Box>

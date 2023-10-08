@@ -30,7 +30,7 @@ const dummyProperties = [
     type: "Single B",
     photo:
       "https://i0.wp.com/blog.bestinamericanliving.com/wp-content/uploads/2017/01/P9617_Cat21_FirstImpressionExterior_20160831100108_38409.jpg",
-      expiry: "09/04/2024",
+    expiry: "09/04/2024",
   },
   // Add more properties as needed
 ];
@@ -47,7 +47,6 @@ function Rooms() {
     setCurrentFilterValues(newFilter);
   };
   const navigate = useNavigate();
-
 
   return (
     <Box ml="40px">
@@ -90,6 +89,7 @@ function Rooms() {
                 // }}
               />
               <Select
+                sx={{ width: "200px" }}
                 variant="outlined"
                 color="info"
                 displayEmpty
@@ -127,7 +127,7 @@ function Rooms() {
           title="Add Property"
           handleClick={() => {
             // Navigate to /rooms/create when the button is clicked
-            navigate("/rooms/create")
+            navigate("/rooms/create");
           }}
           backgroundColor="#475be8"
           color="#fcfcfc"
