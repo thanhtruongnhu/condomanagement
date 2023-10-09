@@ -53,9 +53,7 @@ function Rooms() {
       <Box mt="20px" sx={{ display: "flex", flexWrap: "wrap", gap: 3 }}>
         <Stack direction="column" width="100%">
           <Typography fontSize={25} fontWeight={700} color="#11142d">
-            {!allProperties.length
-              ? "There are no properties"
-              : "All Properties"}
+            {!allProperties.length ? "There are no properties" : "All Rooms"}
           </Typography>
           <Box
             mb={2}
@@ -71,23 +69,6 @@ function Rooms() {
               flexWrap="wrap"
               mb={{ xs: "20px", sm: 0 }}
             >
-              <TextField
-                variant="outlined"
-                color="info"
-                placeholder="Search by title"
-                // value={currentFilterValues.title}
-                // onChange={(e) => {
-                //     setFilters([
-                //         {
-                //             field: "title",
-                //             operator: "contains",
-                //             value: e.currentTarget.value
-                //                 ? e.currentTarget.value
-                //                 : undefined,
-                //         },
-                //     ]);
-                // }}
-              />
               <Select
                 sx={{ width: "200px" }}
                 variant="outlined"
@@ -121,19 +102,6 @@ function Rooms() {
           </Box>
         </Stack>
       </Box>
-
-      <Stack direction="row" justifyContent="space-between" alignItems="center">
-        <CustomButton
-          title="Add Property"
-          handleClick={() => {
-            // Navigate to /rooms/create when the button is clicked
-            navigate("/rooms/create");
-          }}
-          backgroundColor="#475be8"
-          color="#fcfcfc"
-          icon={<Add />}
-        />
-      </Stack>
 
       <Box mt="20px" sx={{ display: "flex", flexWrap: "wrap", gap: 3 }}>
         {allProperties?.map((property) => (

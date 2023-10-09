@@ -2,9 +2,7 @@ import React, { useState } from "react";
 import Box from "@mui/material/Box";
 import { MenuItem, Select, Switch, Typography } from "@mui/material";
 import { DataGrid, GridColDef, GridValueGetterParams } from "@mui/x-data-grid";
-import { Delete } from "@mui/icons-material";
 import { Filter, CurrentFilterValues } from "../interfaces/property";
-import { width } from "@mui/system";
 
 
 type Type = {
