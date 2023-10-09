@@ -38,7 +38,7 @@ export const mainListItems = (
     </Link>
 
     <Link
-      to="/applications"
+      to="/applications/"
       style={{ textDecoration: "none", color: "inherit" }}
     >
       <ListItemButton>
@@ -49,7 +49,7 @@ export const mainListItems = (
       </ListItemButton>
     </Link>
 
-    <Link to="/inquiries" style={{ textDecoration: "none", color: "inherit" }}>
+    <Link to="/inquiries/" style={{ textDecoration: "none", color: "inherit" }}>
       <ListItemButton>
         <ListItemIcon>
           <QuestionAnswerIcon />
@@ -58,7 +58,7 @@ export const mainListItems = (
       </ListItemButton>
     </Link>
 
-    <Link to="/waitlist" style={{ textDecoration: "none", color: "inherit" }}>
+    <Link to="/waitlist/" style={{ textDecoration: "none", color: "inherit" }}>
       <ListItemButton>
         <ListItemIcon>
           <AlarmIcon />

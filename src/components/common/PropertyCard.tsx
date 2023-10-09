@@ -9,6 +9,7 @@ import CardMedia from "@mui/material/CardMedia";
 import CardContent from "@mui/material/CardContent";
 import Stack from "@mui/material/Stack";
 import { PropertyCardProps } from "../../interfaces/property";
+import Chip from "./Chip";
 
 const PropertyCard = ({
   id,
@@ -79,17 +80,8 @@ const PropertyCard = ({
             </Typography>
           </Stack>
         </Stack>
-        <Box
-          px={1.5}
-          py={0.5}
-          borderRadius={1}
-          bgcolor="#dadefa"
-          height="fit-content"
-        >
-          <Typography fontSize={12} fontWeight={600} color="#475be8">
-            {type}
-          </Typography>
-        </Box>
+
+        <Chip type={type} marginLeft={"0"} />
       </CardContent>
     </Card>
   );

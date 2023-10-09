@@ -3,66 +3,7 @@ import Box from "@mui/material/Box";
 import { MenuItem, Select, Switch, Typography } from "@mui/material";
 import { DataGrid, GridColDef, GridValueGetterParams } from "@mui/x-data-grid";
 import { Filter, CurrentFilterValues } from "../interfaces/property";
-
-
-type Type = {
-  type: string;
-};
-
-function Chip({ type }: Type) {
-  const selectBackgroundColor = (type: string) => {
-    switch (type) {
-      case "Single A":
-        return "#dadefa";
-      case "Single B":
-        return "#E8DBF8";
-      case "Double A":
-        return "#F8EBDB";
-      case "Double B":
-        return "#DBF8EA";
-      case "Double C":
-        return "#F6F8DB";
-      default:
-        return "#f50000"; // Red color to detect missing room type
-    }
-  };
-
-  const selectTextColor = (type: string) => {
-    switch (type) {
-      case "Single A":
-        return "#5563E2";
-      case "Single B":
-        return "#B555E2";
-      case "Double A":
-        return "#E2B255";
-      case "Double B":
-        return "#2AAF60";
-      case "Double C":
-        return "#CDC505";
-      default:
-        return "#f50000"; // Red color to detect missing room type
-    }
-  };
-
-  const chipBackgroundColor = selectBackgroundColor(type);
-  const chipTextColor = selectTextColor(type);
-
-
-
-  return (
-    <Box
-      px={1.5}
-      py={0.5}
-      borderRadius={1}
-      bgcolor={chipBackgroundColor}
-      height="fit-content"
-    >
-      <Typography fontSize={12} fontWeight={600} color={chipTextColor}>
-        {type}
-      </Typography>
-    </Box>
-  );
-}
+import Chip from "../components/common/Chip";
 
 const columns: GridColDef[] = [
   { field: "title", headerName: "Room", width: 200 },
@@ -71,7 +12,7 @@ const columns: GridColDef[] = [
     headerName: "Type",
     width: 250,
     renderCell: (params) => {
-      return <Chip type={params.row.type} />;
+      return <Chip type={params.row.type} marginLeft={"0"} />;
     },
   },
   {
@@ -105,7 +46,7 @@ function Inventory() {
   };
 
   const [currentFilterValues, setCurrentFilterValues] =
-  useState<CurrentFilterValues>({});
+    useState<CurrentFilterValues>({});
 
   // Function to handle Switch state changes for a specific row
   const handleSwitchChange = (rowId: number) => {
@@ -151,17 +92,15 @@ function Inventory() {
           }}
           // onSubmit={handleSubmit(onFinishHandler)}
         >
-
           {/* HEADER */}
           <Typography fontSize={25} fontWeight={700} color="#11142d">
             Inventory Control
           </Typography>
 
-
           {/* FILTER */}
           <Select
             // fullWidth
-            sx={{width:"200px"}}
+            sx={{ width: "200px" }}
             variant="outlined"
             color="info"
             displayEmpty
@@ -189,7 +128,6 @@ function Inventory() {
               </MenuItem>
             ))}
           </Select>
-
 
           {/* DATA TABLE */}
           <DataGrid

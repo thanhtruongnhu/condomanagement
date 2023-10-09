@@ -59,7 +59,31 @@ export interface FormProps1 {
   propertyImage: { name: string; url: string };
 }
 
+// export interface InfoCardProps {
+//   title: string;
+//   data: { [key: string]: string }[]; // An array of objects with the PersonInfo structure
+// }
+
+export interface ApplicationInfoCardProps {
+  submissionDate: string;
+  openhouseVisit: boolean;
+  setOpenhouseVisit: (value: boolean) => void; // Define the setOpenhouseVisit function
+}
+
+export interface Type {
+  type: string;
+  marginLeft: string;
+}
+
+export interface DataItem {
+  [key: string]: string | undefined; // Define keys as strings and values as strings or undefined
+}
+
 export interface InfoCardProps {
   title: string;
-  data: { [key: string]: string }[]; // An array of objects with the PersonInfo structure
+  data: DataItem[]; // Accept an array of objects with flexible key-value pairs
+}
+
+export interface DescriptionCardProps {
+  data: DataItem[]; // Accept an array of objects with flexible key-value pairs
 }

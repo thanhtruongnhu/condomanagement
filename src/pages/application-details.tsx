@@ -5,8 +5,7 @@ import Stack from "@mui/material/Stack";
 import { useParams, useNavigate } from "react-router-dom";
 import Delete from "@mui/icons-material/Delete";
 import Edit from "@mui/icons-material/Edit";
-import Place from "@mui/icons-material/Place";
-import Star from "@mui/icons-material/Star";
+import ForwardToInboxIcon from "@mui/icons-material/ForwardToInbox";
 
 import CustomButton from "../components/common/CustomButton";
 import SingleSuitA from "../assets/SingleSuite.jpg";
@@ -15,16 +14,12 @@ import { Button, Container, Grid } from "@mui/material";
 import InfoCard from "../components/common/InfoCard";
 import { CloudDownloadRounded } from "@mui/icons-material";
 import Chip from "../components/common/Chip";
-
-function checkImage(url: any) {
-  const img = new Image();
-  img.src = url;
-  return img.width !== 0 && img.height !== 0;
-}
+import ApplicationInfoCard from "../components/common/ApplicationInfoCard";
+import { useState } from "react";
 
 const mockRooms = [
   {
-    _id: "101",
+    _id: "1",
     title: "Room 101",
     propertyType: "Single A",
     price: 100,
@@ -39,7 +34,7 @@ const mockRooms = [
     },
   },
   {
-    _id: "202",
+    _id: "2",
     title: "Room 202",
     propertyType: "Single B",
     price: 150,
@@ -48,7 +43,52 @@ const mockRooms = [
       "Classic comforts meets contemporary luxury overlooking the courtyard. Explore the best single household unit. Suitable for individual professional and student.",
     photo: SingleSuitA,
     creator: {
-      name: "Jane Smith",
+      name: "Jane Doe",
+      avatar: "https://example.com/avatar2.jpg",
+      allProperties: [4, 5, 6],
+    },
+  },
+  {
+    _id: "3",
+    title: "Room 203",
+    propertyType: "Double A",
+    price: 150,
+    location: "Sample Location 2",
+    description:
+      "Classic comforts meets contemporary luxury overlooking the courtyard. Explore the best single household unit. Suitable for individual professional and student.",
+    photo: SingleSuitA,
+    creator: {
+      name: "Jack Doe",
+      avatar: "https://example.com/avatar2.jpg",
+      allProperties: [4, 5, 6],
+    },
+  },
+  {
+    _id: "4",
+    title: "Room 204",
+    propertyType: "Double B",
+    price: 150,
+    location: "Sample Location 2",
+    description:
+      "Classic comforts meets contemporary luxury overlooking the courtyard. Explore the best single household unit. Suitable for individual professional and student.",
+    photo: SingleSuitA,
+    creator: {
+      name: "Jix Doe",
+      avatar: "https://example.com/avatar2.jpg",
+      allProperties: [4, 5, 6],
+    },
+  },
+  {
+    _id: "5",
+    title: "Room 205",
+    propertyType: "Double C",
+    price: 150,
+    location: "Sample Location 2",
+    description:
+      "Classic comforts meets contemporary luxury overlooking the courtyard. Explore the best single household unit. Suitable for individual professional and student.",
+    photo: SingleSuitA,
+    creator: {
+      name: "Joe Doe",
       avatar: "https://example.com/avatar2.jpg",
       allProperties: [4, 5, 6],
     },
@@ -57,19 +97,46 @@ const mockRooms = [
 
 const mockTenantInfo = [
   {
-    "Main Tenant (Contract holder)": "John Doe",
-    "Date of birth": "September 12th, 1988",
+    "First Name": "John",
+    "Last Name": "Doe",
+    "Date of birth": "12/09/1998",
+    "Driver license #": "PE2930400343",
+    Province: "PEI",
     "Phone number": "9029019xxx",
     "Email Address": "john.doe@example.com",
+    "Desired move-in date": "12/09/2024",
   },
 ];
 
-const mockContractInfo = [
+const mockRentalHistoryInfo = [
   {
-    "Move-in date": "September 12th, 2019",
-    "End-of-contract date": "September 12th, 2024",
-    "60-day end-of-contract reminder": "Sent",
-    "45-day end-of-contract reminder": "Scheduled",
+    "CURRENT ADDRESS": "",
+    "No.": "11",
+    "Street Name": "University Avenue",
+    Citi: "Charlottetown",
+    Province: "PEI",
+    "Postal code": "C1A 3R5",
+    "Since (MM/DD/YYYY)": "11/30/2021",
+    "To (MM/DD/YYYY)": "11/30/2023",
+  },
+  {
+    "CURRENT LANDLORD": "",
+    "First Name": "Moores",
+    "Last Name": "(902) 312 1234",
+    Phone: "Charlottetown",
+    Email: "john.doe@example.com",
+  },
+  {
+    ANSWERS: "",
+    "Have you given notice?": "Yes",
+    "Have you been asked to leave?": "No",
+    "Reason for leaving this property":
+      "I'm leaving my current property as I'm relocating for work. I assure you it's well-maintained, and I've been a responsible tenant. Feel free to contact my current landlord for reference.",
+    "Have you been evicted from a rental residence?": "No",
+    "Have you missed rental payments in the past 12 months?": "Yes",
+    "Have you ever refused to pay rent when due?": "No",
+    "If you have answered YES to any of the above, please state your reasons and/or circumstances":
+      "I'm leaving my current property as I'm relocating for work. I assure you it's well-maintained, and I've been a responsible tenant. Feel free to contact my current landlord for reference.",
   },
 ];
 
@@ -106,9 +173,41 @@ const mockVehicleInfo = [
   },
 ];
 
-const RoomDetails = () => {
+const mockEmploymentInfo = [
+  {
+    "Employment status": "Full-time",
+    Employer: "Moores",
+    "Since (MM/DD/YY)": "12/30/2014",
+    "Street/City": "University Avenue",
+    Province: "PEI",
+    "Postion/Title": "Technician",
+    "Work Supervisor": "Jack Smith",
+    Phone: "(902)-556-9909",
+    "Other source of income": "No",
+  },
+];
+
+const mockReferenceInfo = [
+  {
+    "Full Name": "Azuki Doe",
+    "Relation to applicant": "Co-worker",
+    Phone: "(902)-556-9909",
+    "Email address": "azuki.doe@example.com",
+  },
+];
+
+const mockEmergencyContactInfo = [
+  {
+    "Next of kin": "Amanda Doe",
+    Phone: "(902)-556-9909",
+    Address: "11 Windsor st, Charlottetown, PEI",
+  },
+];
+
+const ApplicationDetails = () => {
   const navigate = useNavigate();
   const { id } = useParams();
+  const [openhouseVisit, setOpenhouseVisit] = useState<boolean>(true);
 
   // Mock function for useShow (fetching property details)
   const queryResult = {
@@ -134,7 +233,7 @@ const RoomDetails = () => {
 
   if (!propertyDetails) {
     // Handle the case where the room with the specified ID is not found
-    return <div>Room not found</div>;
+    return <div>Application not found</div>;
   }
 
   if (isLoading) {
@@ -168,7 +267,7 @@ const RoomDetails = () => {
     >
       <Box pt="20px">
         <Typography fontSize={25} fontWeight={700}>
-          Details
+          Application Details
         </Typography>
       </Box>
 
@@ -187,34 +286,57 @@ const RoomDetails = () => {
             fontWeight={700}
             color="#11142D"
           >
-            {propertyDetails.title}
+            {propertyDetails.creator.name}
           </Typography>
-       
           <Chip type={propertyDetails.propertyType} marginLeft={"20px"} />
         </Grid>
         <Box mr={"10px"}>
           <CustomButton
-            title={"Edit"}
+            title={"Delete"}
+            backgroundColor="red"
+            color="#FCFCFC"
+            fullWidth
+            icon={<Delete />}
+            handleClick={() => {
+              // navigate(`/rooms/edit/${propertyDetails._id}`);
+            }}
+          />
+        </Box>
+        <Box mr={"10px"}>
+          <CustomButton
+            title={"Email"}
             backgroundColor="#475BE8"
             color="#FCFCFC"
             fullWidth
-            icon={<Edit />}
+            icon={<ForwardToInboxIcon />}
             handleClick={() => {
-              navigate(`/rooms/edit/${propertyDetails._id}`);
+              // navigate(`/rooms/edit/${propertyDetails._id}`);
             }}
           />
         </Box>
       </Box>
 
-      <InfoCard title={"1. Tenant Info"} data={mockTenantInfo} />
-      <InfoCard title={"2. Contract Info"} data={mockContractInfo} />
+      <ApplicationInfoCard
+        submissionDate={"11/20/2023"}
+        openhouseVisit={openhouseVisit}
+        setOpenhouseVisit={setOpenhouseVisit}
+      />
+
+      <InfoCard title={"1. Personal Info"} data={mockTenantInfo} />
+      <InfoCard title={"2. Rental History"} data={mockRentalHistoryInfo} />
       <InfoCard title={"3. Other Occupants"} data={mockOtherOccupants} />
       <InfoCard title={"4. Vehicle Info"} data={mockVehicleInfo} />
+      <InfoCard title={"5. Employment"} data={mockEmploymentInfo} />
+      <InfoCard title={"6. Additional Reference"} data={mockReferenceInfo} />
+      <InfoCard
+        title={"7. Emergency Contact"}
+        data={mockEmergencyContactInfo}
+      />
 
       {/* CreditReportCard */}
       <Box mt={"30px"} ml={"5px"} pb={"60px"}>
         <Typography fontSize={20} fontWeight={700}>
-          {"5. Credit Report"}
+          {"8. Credit Report"}
         </Typography>
 
         <Box mt={"20px"}>
@@ -231,4 +353,4 @@ const RoomDetails = () => {
   );
 };
 
-export default RoomDetails;
+export default ApplicationDetails;

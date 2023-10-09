@@ -23,7 +23,7 @@ const mockRooms = [
     {
       _id: "202",
       title: "Room 202",
-      propertyType: "Single Suite B",
+      propertyType: "Single B",
       price: 150,
       location: "Sample Location 2",
       description:

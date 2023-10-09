@@ -7,6 +7,12 @@ import { Box, Chip, Typography } from "@mui/material";
 import { InfoCardProps } from "../../interfaces/common";
 import { styled } from "@mui/material/styles";
 
+const StyledTableContainer = styled(TableContainer)(({}) => ({
+  border: "1px solid #DDDDDD" /* Border style and color */,
+  borderRadius: "12px",
+  marginTop: "20px",
+}));
+
 const StyledTableRow = styled(TableRow)(({}) => ({
   // hide last border
   "&:last-child td, &:last-child th": {
@@ -14,14 +20,8 @@ const StyledTableRow = styled(TableRow)(({}) => ({
   },
 }));
 
-const StyledTableContainer = styled(TableContainer)(({}) => ({
-  border: "1px solid #DDDDDD" /* Border style and color */,
-  borderRadius: "12px",
-  marginTop: "20px",
-}));
-
 export default function InfoCard({ title, data }: InfoCardProps) {
-  const renderTableCell = (value: string) => {
+  const renderTableCell = (value: string | undefined) => {
     if (value === "Scheduled") {
       return <Chip color="warning" label={value} size="small" />;
     }
@@ -42,31 +42,45 @@ export default function InfoCard({ title, data }: InfoCardProps) {
           {title}
         </Typography>
       </Box>
-      {data.map((person, index) => (
+      {data.map((item, index) => (
         <StyledTableContainer key={index}>
           <Table
             size="small"
             aria-label={`a dense table for item ${index + 1}`}
           >
             <TableBody>
-              {Object.entries(person).map(([key, value]) => (
-                <StyledTableRow key={key}>
-                  <TableCell
-                    sx={{ fontSize: 13, fontWeight: 700 }}
-                    component="th"
-                    scope="row"
-                  >
-                    {key}
-                  </TableCell>
-                  <TableCell
-                    height={"40px"}
-                    align="right"
-                    sx={{ fontSize: 16 }}
-                  >
-                    {renderTableCell(value)}
-                  </TableCell>
-                </StyledTableRow>
-              ))}
+              {Object.entries(item).map(([key, value], innerIndex) =>
+                !value && innerIndex === 0 ? (
+                  // Header row
+                  <StyledTableRow key={key} sx={{ backgroundColor: "#F6F6F6" }}>
+                    <TableCell
+                      height="40px"
+                      sx={{ fontSize: 11, fontWeight: 700 }}
+                    >
+                      {key}
+                    </TableCell>
+                    <TableCell />
+                  </StyledTableRow>
+                ) : (
+                  <StyledTableRow key={key}>
+                    <TableCell
+                      sx={{ fontSize: 13, fontWeight: 700 }}
+                      component="th"
+                      scope="row"
+                    >
+                      {key}
+                    </TableCell>
+                    <TableCell
+                      height="40px"
+                      align="right"
+                      // width={"750px"}
+                      sx={{ fontSize: 16 }}
+                    >
+                      {renderTableCell(value)}
+                    </TableCell>
+                  </StyledTableRow>
+                )
+              )}
             </TableBody>
           </Table>
         </StyledTableContainer>

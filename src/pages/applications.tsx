@@ -10,64 +10,10 @@ import {
 import { DataGrid, GridColDef, GridRowParams, GridValueGetterParams } from "@mui/x-data-grid";
 import { Filter, CurrentFilterValues } from "../interfaces/property";
 import DeleteIcon from "@mui/icons-material/Delete";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom"; 
+import { Type } from "../interfaces/common";
+import Chip from "../components/common/Chip";
 
-type Type = {
-  type: string;
-};
-
-function Chip({ type }: Type) {
-  const selectBackgroundColor = (type: string) => {
-    switch (type) {
-      case "Single A":
-        return "#dadefa";
-      case "Single B":
-        return "#E8DBF8";
-      case "Double A":
-        return "#F8EBDB";
-      case "Double B":
-        return "#DBF8EA";
-      case "Double C":
-        return "#F6F8DB";
-      default:
-        return "#f50000"; // Red color to detect missing room type
-    }
-  };
-
-  const selectTextColor = (type: string) => {
-    switch (type) {
-      case "Single A":
-        return "#5563E2";
-      case "Single B":
-        return "#B555E2";
-      case "Double A":
-        return "#E2B255";
-      case "Double B":
-        return "#2AAF60";
-      case "Double C":
-        return "#CDC505";
-      default:
-        return "#f50000"; // Red color to detect missing room type
-    }
-  };
-
-  const chipBackgroundColor = selectBackgroundColor(type);
-  const chipTextColor = selectTextColor(type);
-
-  return (
-    <Box
-      px={1.5}
-      py={0.5}
-      borderRadius={1}
-      bgcolor={chipBackgroundColor}
-      height="fit-content"
-    >
-      <Typography fontSize={12} fontWeight={600} color={chipTextColor}>
-        {type}
-      </Typography>
-    </Box>
-  );
-}
 
 const columns: GridColDef[] = [
   { field: "applicantName", headerName: "Applicant name", width: 150 },
@@ -76,7 +22,7 @@ const columns: GridColDef[] = [
     headerName: "Type",
     width: 150,
     renderCell: (params) => {
-      return <Chip type={params.row.type} />;
+      return <Chip type={params.row.type} marginLeft={"0"} />;
     },
   },
   {
@@ -180,8 +126,10 @@ function Applications() {
   const handleRowClick = (params: GridRowParams) => {
     // console.log(params)
     const pathName = window.location.pathname;
+    // console.log("path::",pathName)
     // Redirect the user to a different page with the row ID as a parameter
-    navigate(`${pathName}/${params.row.id}`);
+    navigate(`${pathName}${params.row.id}`);
+    // console.log("path2::",`${pathName}/${params.row.id}`)
   };
 
   const setFilters = (newFilter: Filter) => {

@@ -17,6 +17,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import Theme from "../../theme";
 import { Add, Delete, PublishedWithChangesSharp } from "@mui/icons-material";
 import PublishIcon from "@mui/icons-material/Publish";
+import Chip from "./Chip";
 
 const mockOtherOccupants = [
   {
@@ -93,18 +94,8 @@ const FormEditRoom = ({
                 >
                   {propertyDetails.title}
                 </Typography>
-                <Box
-                  ml={"20px"}
-                  px={1.5}
-                  py={0.5}
-                  borderRadius={1}
-                  bgcolor="#dadefa"
-                  height="fit-content"
-                >
-                  <Typography fontSize={12} fontWeight={600} color="#475be8">
-                    {propertyDetails.propertyType}
-                  </Typography>
-                </Box>
+
+                <Chip type={propertyDetails.propertyType} marginLeft={"20px"} />
               </Grid>
             </Box>
 
@@ -490,11 +481,9 @@ const FormEditRoom = ({
               />
             </Box>
 
-
-
             {/* Submit & Cancel buttons */}
             <Stack
-            mt={"100px"}
+              mt={"100px"}
               direction={isSmallScreen ? "column" : "row"}
               gap={4}
               justifyContent={isSmallScreen ? "flex-start" : "space-between"} // Adjust alignment based on screen size
