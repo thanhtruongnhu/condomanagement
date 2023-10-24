@@ -1,3 +1,6 @@
+import dayjs, { Dayjs } from "dayjs";
+import { DataItem } from "./common";
+
 export interface FormFieldProp {
   title: string;
   labelName: string;
@@ -41,4 +44,67 @@ export interface Room {
     avatar: string;
     allProperties: number[];
   };
+}
+
+export interface Property {
+  _id: string;
+  apartmentNumber: string;
+  tenants: {
+    firstName: string;
+    lastName: string;
+  }[];
+  apartmentType: {
+    aptCode: string;
+  };
+  contractEndDate: string;
+}
+
+export interface Tenant {
+  firstName: string;
+  lastName: string;
+  email: string;
+  phoneNumber: string;
+  contractDocId: string;
+  creditReportId: string;
+  dob: dayjs;
+  carModel: CarModel[];
+  occupants: Occupant[];
+}
+
+export interface CarModel {
+  _id: string;
+  make: string;
+  model: string;
+  color: string;
+  licensePlate: string;
+}
+
+export interface Occupant {
+  _id: string;
+  name: string;
+  dob: dayjs;
+  relationToApplicant: string;
+}
+
+export interface ApartmentType {
+  _id: string;
+  bathNum: number;
+  aptCode: string;
+  bdNum: number;
+  sqFeet: number;
+  aptTypeDescription: string;
+}
+
+export interface ApartmentData {
+  _id: string;
+  apartmentNumber: string;
+  contractStartDate: string;
+  contractEndDate: string;
+  reminder60days: string;
+  reminder45days: string;
+  currentRent: number;
+  depositAmount: number;
+  apartmentType: ApartmentType;
+  tenants: Tenant[]; // Define the Tenant type here
+  occupants: Occupant[]; // Define the Occupant type here
 }

@@ -1,9 +1,8 @@
-import React, { useState, useRef } from "react";
+import React, { useRef } from "react";
 import Button from "@mui/material/Button";
 import { CustomButtonProps } from "../../interfaces/common";
 
 const CustomButton = ({
-  type,
   title,
   backgroundColor,
   color,
@@ -15,11 +14,9 @@ const CustomButton = ({
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const handleFileInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    // Handle the selected file here, e.target.files[0]
     const selectedFile = e.target.files![0];
     console.log("Selected file:", selectedFile);
 
-    // Optionally, you can hide the file input after selection
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
     }
@@ -29,7 +26,6 @@ const CustomButton = ({
     <div>
       <Button
         disabled={disabled}
-        type={type === "submit" ? "submit" : "button"}
         sx={{
           flex: fullWidth ? 1 : "unset",
           padding: "10px 15px",
@@ -47,14 +43,10 @@ const CustomButton = ({
           },
         }}
         onClick={() => {
-          if (title === "Upload") {
-            // Trigger the file input dialog when the button is clicked
-            if (fileInputRef.current) {
-              fileInputRef.current.click();
-            }
+          if (title === "Upload" && fileInputRef.current) {
+            fileInputRef.current.click();
           }
           if (handleClick) {
-            // Handle the regular button click
             handleClick();
           }
         }}
@@ -63,7 +55,6 @@ const CustomButton = ({
         {title}
       </Button>
 
-      {/* Hidden file input. This input is only rendered if title === Upload */}
       <input
         ref={fileInputRef}
         hidden

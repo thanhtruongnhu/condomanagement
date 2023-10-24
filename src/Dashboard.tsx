@@ -145,7 +145,7 @@ export default function Dashboard() {
                 noWrap
                 sx={{ flexGrow: 1 }}
               >
-                Main Interface
+                {/* Main Interface */}
               </Typography>
               <IconButton color="inherit">
                 <Badge badgeContent={4} color="secondary">
@@ -189,7 +189,7 @@ export default function Dashboard() {
             {/* Toolbar component is a gap */}
             <Toolbar />
             <Routes>
-              <Route path="/dashboard" element={<Dash />} />
+              {/* <Route path="/dashboard" element={<Dash />} /> */}
               <Route path="/rooms" element={<Rooms />} />
               <Route path="/inventory" element={<Inventory />} />
               <Route path="/applications" element={<Applications />} />

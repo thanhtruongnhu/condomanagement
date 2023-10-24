@@ -1,72 +1,41 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import FormEditRoom from "../components/common/FormEditRoom";
-import SingleSuitA from "../assets/SingleSuite.jpg"
-import { Room } from "../interfaces/property"
+import SingleSuitA from "../assets/SingleSuite.jpg";
+import { ApartmentData, Room } from "../interfaces/property";
 import { useParams } from "react-router-dom";
-
-const mockRooms = [
-    {
-      _id: "101",
-      title: "Room 101",
-      propertyType: "Single A",
-      price: 100,
-      location: "Sample Location 1",
-      description:
-        "Classic comforts meets contemporary luxury overlooking the courtyard. Explore the best single household unit. Suitable for individual professional and student.",
-      photo: SingleSuitA,
-      creator: {
-        name: "John Doe",
-        avatar: "https://example.com/avatar1.jpg",
-        allProperties: [1, 2, 3],
-      },
-    },
-    {
-      _id: "202",
-      title: "Room 202",
-      propertyType: "Single B",
-      price: 150,
-      location: "Sample Location 2",
-      description:
-        "Classic comforts meets contemporary luxury overlooking the courtyard. Explore the best single household unit. Suitable for individual professional and student.",
-      photo: SingleSuitA,
-      creator: {
-        name: "Jane Smith",
-        avatar: "https://example.com/avatar2.jpg",
-        allProperties: [4, 5, 6],
-      },
-    },
-  ];
 
 const EditRoom = () => {
   const [propertyImage, setPropertyImage] = useState({ name: "", url: "" });
   // Mock function for useShow (fetching property details)
-  const queryResult = {
-    data: mockRooms,
-    isLoading: false,
-    isError: false,
-  };
-  const { data, isLoading, isError } = queryResult;
+  // const queryResult = {
+  //   data: mockRooms,
+  //   isLoading: false,
+  //   isError: false,
+  // };
+  // const { data, isLoading, isError } = queryResult;
   const { id } = useParams();
-
-  // Find the room details by matching the ID
-  const propertyDetails = queryResult.data.find(
-    (room: Room) => room._id === id
+  const [apartmentData, setApartmentData] = useState<ApartmentData | null>(
+    null
   );
 
-  if (!propertyDetails) {
-    // Handle the case where the room with the specified ID is not found
-    return <div>Room not found</div>;
-  }
+  useEffect(() => {
+    const fetchApartmentData = async () => {
+      try {
+        const response = await fetch(`http://localhost:3000/apartment/${id}`);
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        const data = await response.json();
+        setApartmentData(data);
+      } catch (error) {
+        console.error("Error fetching apartment data:", error);
+      }
+    };
 
-  if (isLoading) {
-    return <div>Loading...</div>;
-  }
+    fetchApartmentData();
+  }, []);
 
-  if (isError) {
-    return <div>Something went wrong!</div>;
-  }
-
-  return <FormEditRoom type="Edit" propertyDetails={propertyDetails}/>;
+  return <FormEditRoom type="Edit" propertyDetails={apartmentData} />;
 };
 
 export default EditRoom;

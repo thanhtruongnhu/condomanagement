@@ -11,7 +11,7 @@ const StyledTableContainer = styled(TableContainer)(({}) => ({
   border: "1px solid #DDDDDD" /* Border style and color */,
   borderRadius: "12px",
   marginTop: "20px",
-}));
+}));  
 
 const StyledTableRow = styled(TableRow)(({}) => ({
   // hide last border

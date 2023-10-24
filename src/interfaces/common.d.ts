@@ -1,4 +1,4 @@
-import { Room } from "./property";
+import { ApartmentData, Room } from "./property";
 
 export interface CustomButtonProps {
   type?: string;
@@ -41,7 +41,7 @@ export interface FormProps {
   // handleSubmit: FormEventHandler<HTMLFormElement> | undefined;
   // handleImageChange: (file) => void;
   // onFinishHandler: (data: FieldValues) => Promise<void> | void;
-  propertyDetails: Room;
+  propertyDetails: ApartmentData | null;
 }
 
 export interface FormProps1 {

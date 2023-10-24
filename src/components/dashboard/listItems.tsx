@@ -12,14 +12,14 @@ import { Link } from "react-router-dom";
 
 export const mainListItems = (
   <React.Fragment>
-    <Link to="/dashboard" style={{ textDecoration: "none", color: "inherit" }}>
+    {/* <Link to="/dashboard" style={{ textDecoration: "none", color: "inherit" }}>
       <ListItemButton>
         <ListItemIcon>
           <DashboardIcon />
         </ListItemIcon>
         <ListItemText primary="Dashboard" />
       </ListItemButton>
-    </Link>
+    </Link> */}
     <Link to="/rooms" style={{ textDecoration: "none", color: "inherit" }}>
       <ListItemButton>
         <ListItemIcon>

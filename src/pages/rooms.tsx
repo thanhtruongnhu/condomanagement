@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Add from "@mui/icons-material/Add";
 import Box from "@mui/material/Box";
 import Stack from "@mui/material/Stack";
@@ -11,42 +11,116 @@ import { useMemo } from "react";
 import CustomButton from "../components/common/CustomButton";
 import PropertyCard from "../components/common/PropertyCard";
 import { Filter, CurrentFilterValues } from "../interfaces/property";
+import { Property } from "../interfaces/property";
 
 // Dummy data for allProperties
-const dummyProperties = [
-  {
-    _id: "1",
-    title: "101",
-    tenant: "John Doe",
-    type: "Single A",
-    photo:
-      "https://i0.wp.com/blog.bestinamericanliving.com/wp-content/uploads/2017/01/P9617_Cat21_FirstImpressionExterior_20160831100108_38409.jpg",
-    expiry: "01/28/2024",
-  },
-  {
-    _id: "2",
-    title: "202",
-    tenant: "Jane Doe",
-    type: "Single B",
-    photo:
-      "https://i0.wp.com/blog.bestinamericanliving.com/wp-content/uploads/2017/01/P9617_Cat21_FirstImpressionExterior_20160831100108_38409.jpg",
-    expiry: "09/04/2024",
-  },
-  // Add more properties as needed
-];
+// const dummyProperties = [
+//   {
+//     _id: "1",
+//     title: "101",
+//     tenant: "John Doe",
+//     type: "Single A",
+//     photo:
+//       "https://i0.wp.com/blog.bestinamericanliving.com/wp-content/uploads/2017/01/P9617_Cat21_FirstImpressionExterior_20160831100108_38409.jpg",
+//     expiry: "01/28/2024",
+//   },
+//   {
+//     _id: "2",
+//     title: "202",
+//     tenant: "Jane Doe",
+//     type: "Single B",
+//     photo:
+//       "https://i0.wp.com/blog.bestinamericanliving.com/wp-content/uploads/2017/01/P9617_Cat21_FirstImpressionExterior_20160831100108_38409.jpg",
+//     expiry: "09/04/2024",
+//   },
+//   {
+//     _id: "3",
+//     title: "203",
+//     tenant: "Jane Doe",
+//     type: "Single B",
+//     photo:
+//       "https://i0.wp.com/blog.bestinamericanliving.com/wp-content/uploads/2017/01/P9617_Cat21_FirstImpressionExterior_20160831100108_38409.jpg",
+//     expiry: "09/04/2024",
+//   },
+//   {
+//     _id: "4",
+//     title: "204",
+//     tenant: "Jane Doe",
+//     type: "Double B",
+//     photo:
+//       "https://i0.wp.com/blog.bestinamericanliving.com/wp-content/uploads/2017/01/P9617_Cat21_FirstImpressionExterior_20160831100108_38409.jpg",
+//     expiry: "09/04/2024",
+//   },
+//   {
+//     _id: "5",
+//     title: "202",
+//     tenant: "Jane Doe",
+//     type: "Double A",
+//     photo:
+//       "https://i0.wp.com/blog.bestinamericanliving.com/wp-content/uploads/2017/01/P9617_Cat21_FirstImpressionExterior_20160831100108_38409.jpg",
+//     expiry: "09/04/2024",
+//   },
+//   {
+//     _id: "7",
+//     title: "205",
+//     tenant: "Jane Doe",
+//     type: "Double B",
+//     photo:
+//       "https://i0.wp.com/blog.bestinamericanliving.com/wp-content/uploads/2017/01/P9617_Cat21_FirstImpressionExterior_20160831100108_38409.jpg",
+//     expiry: "09/04/2024",
+//   },
+//   {
+//     _id: "8",
+//     title: "301",
+//     tenant: "Jane Doe",
+//     type: "Double C",
+//     photo:
+//       "https://i0.wp.com/blog.bestinamericanliving.com/wp-content/uploads/2017/01/P9617_Cat21_FirstImpressionExterior_20160831100108_38409.jpg",
+//     expiry: "09/04/2024",
+//   },
+//   // Add more properties as needed
+// ];
+
+
 
 function Rooms() {
   const [current, setCurrent] = useState(1);
   const [pageSize, setPageSize] = useState(10); // Default page size
   const [currentFilterValues, setCurrentFilterValues] =
     useState<CurrentFilterValues>({});
+  const [allProperties, setAllProperties] = useState<Property[]>([]);
 
-  const allProperties = dummyProperties; // Replace with actual data
   const pageCount = Math.ceil(allProperties.length / pageSize);
   const setFilters = (newFilter: Filter) => {
     setCurrentFilterValues(newFilter);
   };
-  const navigate = useNavigate();
+
+  function formatDate(dateString: string): string {
+    const date = new Date(dateString);
+    const options: Intl.DateTimeFormatOptions = {
+      month: "2-digit",
+      day: "2-digit",
+      year: "numeric", // Use "numeric" instead of a string
+    };
+    return date.toLocaleDateString(undefined, options) || "";
+  }
+
+  const fetchProperties = async () => {
+    try {
+      const response = await fetch("http://localhost:3000/apartment/");
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+      const apiResponse = await response.json();
+      setAllProperties(apiResponse);
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchProperties();
+  }, []);
 
   return (
     <Box ml="40px">
@@ -104,15 +178,15 @@ function Rooms() {
       </Box>
 
       <Box mt="20px" sx={{ display: "flex", flexWrap: "wrap", gap: 3 }}>
-        {allProperties?.map((property) => (
+        {allProperties?.map((property, index) => (
           <PropertyCard
-            key={property._id}
-            id={property.title}
-            title={property.title}
-            tenant={property.tenant}
-            type={property.type}
-            photo={property.photo}
-            expiry={property.expiry}
+            key={index} // Change the key to use the index
+            id={property._id}
+            title={property.apartmentNumber}
+            tenant={`${property.tenants[0].firstName} ${property.tenants[0].lastName}`}
+            type={property.apartmentType.aptCode}
+            photo="https://i0.wp.com/blog.bestinamericanliving.com/wp-content/uploads/2017/01/P9617_Cat21_FirstImpressionExterior_20160831100108_38409.jpg"
+            expiry={formatDate(property.contractEndDate)}
           />
         ))}
       </Box>
