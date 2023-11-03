@@ -10,77 +10,8 @@ import { useNavigate } from "react-router-dom";
 import { useMemo } from "react";
 import CustomButton from "../components/common/CustomButton";
 import PropertyCard from "../components/common/PropertyCard";
-import { Filter, CurrentFilterValues } from "../interfaces/property";
+import { Filter, CurrentFilterValues, ApartmentData } from "../interfaces/property";
 import { Property } from "../interfaces/property";
-
-// Dummy data for allProperties
-// const dummyProperties = [
-//   {
-//     _id: "1",
-//     title: "101",
-//     tenant: "John Doe",
-//     type: "Single A",
-//     photo:
-//       "https://i0.wp.com/blog.bestinamericanliving.com/wp-content/uploads/2017/01/P9617_Cat21_FirstImpressionExterior_20160831100108_38409.jpg",
-//     expiry: "01/28/2024",
-//   },
-//   {
-//     _id: "2",
-//     title: "202",
-//     tenant: "Jane Doe",
-//     type: "Single B",
-//     photo:
-//       "https://i0.wp.com/blog.bestinamericanliving.com/wp-content/uploads/2017/01/P9617_Cat21_FirstImpressionExterior_20160831100108_38409.jpg",
-//     expiry: "09/04/2024",
-//   },
-//   {
-//     _id: "3",
-//     title: "203",
-//     tenant: "Jane Doe",
-//     type: "Single B",
-//     photo:
-//       "https://i0.wp.com/blog.bestinamericanliving.com/wp-content/uploads/2017/01/P9617_Cat21_FirstImpressionExterior_20160831100108_38409.jpg",
-//     expiry: "09/04/2024",
-//   },
-//   {
-//     _id: "4",
-//     title: "204",
-//     tenant: "Jane Doe",
-//     type: "Double B",
-//     photo:
-//       "https://i0.wp.com/blog.bestinamericanliving.com/wp-content/uploads/2017/01/P9617_Cat21_FirstImpressionExterior_20160831100108_38409.jpg",
-//     expiry: "09/04/2024",
-//   },
-//   {
-//     _id: "5",
-//     title: "202",
-//     tenant: "Jane Doe",
-//     type: "Double A",
-//     photo:
-//       "https://i0.wp.com/blog.bestinamericanliving.com/wp-content/uploads/2017/01/P9617_Cat21_FirstImpressionExterior_20160831100108_38409.jpg",
-//     expiry: "09/04/2024",
-//   },
-//   {
-//     _id: "7",
-//     title: "205",
-//     tenant: "Jane Doe",
-//     type: "Double B",
-//     photo:
-//       "https://i0.wp.com/blog.bestinamericanliving.com/wp-content/uploads/2017/01/P9617_Cat21_FirstImpressionExterior_20160831100108_38409.jpg",
-//     expiry: "09/04/2024",
-//   },
-//   {
-//     _id: "8",
-//     title: "301",
-//     tenant: "Jane Doe",
-//     type: "Double C",
-//     photo:
-//       "https://i0.wp.com/blog.bestinamericanliving.com/wp-content/uploads/2017/01/P9617_Cat21_FirstImpressionExterior_20160831100108_38409.jpg",
-//     expiry: "09/04/2024",
-//   },
-//   // Add more properties as needed
-// ];
-
 
 
 function Rooms() {
@@ -88,7 +19,7 @@ function Rooms() {
   const [pageSize, setPageSize] = useState(10); // Default page size
   const [currentFilterValues, setCurrentFilterValues] =
     useState<CurrentFilterValues>({});
-  const [allProperties, setAllProperties] = useState<Property[]>([]);
+  const [allProperties, setAllProperties] = useState<ApartmentData[]>([]);
 
   const pageCount = Math.ceil(allProperties.length / pageSize);
   const setFilters = (newFilter: Filter) => {

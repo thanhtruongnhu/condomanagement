@@ -28,96 +28,14 @@ import {
   InfoCardProps,
 } from "../interfaces/common";
 import formatDate from "../components/common/DateFormatter";
+import DescriptionCard from "../components/common/DescriptionCard";
 
-function checkImage(url: any) {
-  const img = new Image();
-  img.src = url;
-  return img.width !== 0 && img.height !== 0;
-}
-
-// const mockRooms = [
-//   {
-//     _id: "101",
-//     title: "Room 101",
-//     propertyType: "Single A",
-//     price: 100,
-//     location: "Sample Location 1",
-//     description:
-//       "Classic comforts meets contemporary luxury overlooking the courtyard. Explore the best single household unit. Suitable for individual professional and student.",
-//     photo: SingleSuitA,
-//     creator: {
-//       name: "John Doe",
-//       avatar: "https://example.com/avatar1.jpg",
-//       allProperties: [1, 2, 3],
-//     },
-//   },
-//   {
-//     _id: "202",
-//     title: "Room 202",
-//     propertyType: "Single B",
-//     price: 150,
-//     location: "Sample Location 2",
-//     description:
-//       "Classic comforts meets contemporary luxury overlooking the courtyard. Explore the best single household unit. Suitable for individual professional and student.",
-//     photo: SingleSuitA,
-//     creator: {
-//       name: "Jane Smith",
-//       avatar: "https://example.com/avatar2.jpg",
-//       allProperties: [4, 5, 6],
-//     },
-//   },
-// ];
-
-// const mockTenantInfo = [
-//   {
-//     "Main Tenant (Contract holder)": "John Doe",
-//     "Date of birth": "September 12th, 1988",
-//     "Phone number": "9029019xxx",
-//     "Email Address": "john.doe@example.com",
-//   },
-// ];
-
-// const mockContractInfo = [
-//   {
-//     "Move-in date": "September 12th, 2019",
-//     "End-of-contract date": "September 12th, 2024",
-//     "60-day end-of-contract reminder": "Sent",
-//     "45-day end-of-contract reminder": "Scheduled",
-//   },
-// ];
-
-// const mockOtherOccupants = [
-//   {
-//     "Tenant name": "Jane Doe",
-//     "Date of birth": "September 12th, 1988",
-//     "Relation to main tenant": "Spouse",
-//   },
-//   {
-//     "Tenant name": "Jinx Doe",
-//     "Date of birth": "September 12th, 1988",
-//     "Relation to main tenant": "Daughter",
-//   },
-//   {
-//     "Tenant name": "Jack Doe",
-//     "Date of birth": "September 12th, 1988",
-//     "Relation to main tenant": "Son",
-//   },
-// ];
-
-// const mockVehicleInfo = [
-//   {
-//     Make: "Honda",
-//     Model: "Civic Sedan 4 door",
-//     Color: "Blue",
-//     "License plate #": "DOLY-389",
-//   },
-//   {
-//     Make: "Toyota",
-//     Model: "Camry Hatchback",
-//     Color: "Black",
-//     "License plate #": "COLY-389",
-//   },
-// ];
+const mockInquiryQuestionInfo = [
+  {
+    Question:
+      "Could you please clarify which utilities are included in the rental, such as cable TV, wifi, electricity, and any other services? Understanding the utility coverage will help me plan and budget accordingly for my stay in the property. Your clarification on this matter would be greatly appreciated. Thank you.",
+  },
+];
 
 const RoomDetails = () => {
   const navigate = useNavigate();
@@ -131,6 +49,7 @@ const RoomDetails = () => {
   const [mockOtherOccupants, setMockOtherOccupants] = useState<DataItem[]>([]);
   const [mockVehicleInfo, setMockVehicleInfo] = useState<DataItem[]>([]);
   const [mockContractInfo, setmockContractInfo] = useState<DataItem[]>([]);
+  const [notes, setNotes] = useState<DataItem[]>([]);
 
   useEffect(() => {
     const fetchApartmentData = async () => {
@@ -180,6 +99,7 @@ const RoomDetails = () => {
     const mainTenant = data.tenants[0];
     const occupants = data.tenants[0].occupants; // Excluding the main tenant
     const carModels = data.tenants[0].carModel;
+    const notes = [{ "Notes for this tenant": data.notes }];
 
     const mockTenantInfo = [
       {
@@ -221,6 +141,7 @@ const RoomDetails = () => {
     setMockOtherOccupants(mockOtherOccupants);
     setMockVehicleInfo(mockVehicleInfo);
     setmockContractInfo(mockContractInfo);
+    setNotes(notes);
   };
 
   // Call the processing function when apartmentData changes
@@ -244,26 +165,6 @@ const RoomDetails = () => {
     // Mock success, you can add your own logic here
     console.log(`Deleted property with ID: ${id}`);
   };
-
-  //   const propertyDetails = queryResult.data;
-
-  // // Find the room details by matching the ID
-  // const propertyDetails = queryResult.data.find(
-  //   (room: Room) => room._id === id
-  // );
-
-  // if (!propertyDetails) {
-  //   // Handle the case where the room with the specified ID is not found
-  //   return <div>Room not found</div>;
-  // }
-
-  // if (isLoading) {
-  //   return <div>Loading...</div>;
-  // }
-
-  // if (isError) {
-  //   return <div>Something went wrong!</div>;
-  // }
 
   const handleDeleteProperty = () => {
     if (id) {
@@ -346,7 +247,7 @@ const RoomDetails = () => {
       <InfoCard title={"4. Vehicle Info"} data={mockVehicleInfo} />
 
       {/* CreditReportCard */}
-      <Box mt={"30px"} ml={"5px"} pb={"60px"}>
+      <Box mt={"30px"} ml={"5px"}>
         <Typography fontSize={20} fontWeight={700}>
           {"5. Credit Report"}
         </Typography>
@@ -359,6 +260,16 @@ const RoomDetails = () => {
             icon={<CloudDownloadRounded />}
             handleClick={() => {}}
           />
+        </Box>
+      </Box>
+
+      {/* Notes */}
+      <Box mt={"30px"} ml={"5px"}>
+        <Typography fontSize={20} fontWeight={700}>
+          {"6. Notes"}
+        </Typography>
+        <Box pb={"60px"}>
+          <DescriptionCard data={notes} />
         </Box>
       </Box>
     </Container>

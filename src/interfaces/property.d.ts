@@ -104,7 +104,15 @@ export interface ApartmentData {
   reminder45days: string;
   currentRent: number;
   depositAmount: number;
+  notes: string;
   apartmentType: ApartmentType;
-  tenants: Tenant[]; // Define the Tenant type here
-  occupants: Occupant[]; // Define the Occupant type here
+  aptAvailableFrom: string;
+  aptAvailability: boolean;
+  tenants: Tenant[];
+  occupants: Occupant[];
+}
+
+export interface putData {
+  aptAvailability: boolean;
+  aptAvailableFrom: string;
 }

@@ -4,7 +4,7 @@ import FormControl from "@mui/material/FormControl";
 import FormHelperText from "@mui/material/FormHelperText";
 import TextField from "@mui/material/TextField";
 import Stack from "@mui/material/Stack";
-import { Grid, useMediaQuery } from "@mui/material";
+import { Grid, TextareaAutosize, useMediaQuery } from "@mui/material";
 import * as React from "react";
 import { Dayjs } from "dayjs";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
@@ -22,6 +22,7 @@ import { ApartmentData } from "../../interfaces/property";
 
 const FormEditRoom = ({ type, propertyDetails }: FormProps) => {
   const navigate = useNavigate();
+  const { id } = useParams();
   // console.log("roomData::", propertyDetails);
 
   const isSmallScreen = useMediaQuery(Theme.breakpoints.down("sm"));
@@ -50,6 +51,61 @@ const FormEditRoom = ({ type, propertyDetails }: FormProps) => {
   //     });
   //   }
   // };
+
+  const handleCreateOccupant = (index: number) => {
+    handleFieldChange(`tenants.0.occupants.${index}.name`, "");
+    handleFieldChange(`tenants.0.occupants.${index}.dob`, "");
+    handleFieldChange(`tenants.0.occupants.${index}.relationToApplicant`, "");
+  };
+
+  const handleCreateVehicle = (index: number) => {
+    handleFieldChange(`tenants.0.carModel.${index}.make`, "");
+    handleFieldChange(`tenants.0.carModel.${index}.model`, "");
+    handleFieldChange(`tenants.0.carModel.${index}.color`, "");
+    handleFieldChange(`tenants.0.carModel.${index}.licensePlate`, "");
+  };
+
+  const handleDeleteOccupant = (index: number) => {
+    // Clone the current form data
+    const updatedFormData = { ...formData };
+
+    // Check if tenants array is defined, and if not, initialize it as an empty array
+    if (!updatedFormData.tenants) {
+      updatedFormData.tenants = [];
+    }
+
+    // Check if _id is defined, and if not, assign a default value (e.g., "")
+    if (updatedFormData._id === undefined) {
+      updatedFormData._id = "";
+    }
+
+    // Remove the occupant at the specified index
+    updatedFormData.tenants[0].occupants.splice(index, 1);
+
+    // Update the state with the modified data using a type assertion
+    setFormData(updatedFormData as ApartmentData);
+  };
+
+  const handleDeleteVehicle = (index: number) => {
+    // Clone the current form data
+    const updatedFormData = { ...formData };
+
+    // Check if tenants array is defined, and if not, initialize it as an empty array
+    if (!updatedFormData.tenants) {
+      updatedFormData.tenants = [];
+    }
+
+    // Check if _id is defined, and if not, assign a default value (e.g., "")
+    if (updatedFormData._id === undefined) {
+      updatedFormData._id = "";
+    }
+
+    // Remove the occupant at the specified index
+    updatedFormData.tenants[0].carModel.splice(index, 1);
+
+    // Update the state with the modified data using a type assertion
+    setFormData(updatedFormData as ApartmentData);
+  };
 
   // Function to handle form field changes
   const handleFieldChange = (fieldName: string, value: string) => {
@@ -87,16 +143,13 @@ const FormEditRoom = ({ type, propertyDetails }: FormProps) => {
 
     console.log("roomData::", formData);
     try {
-      const response = await fetch(
-        `YOUR_API_ENDPOINT/${formData ? formData._id : 500}`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(formData),
-        }
-      );
+      const response = await fetch(`http://localhost:3000/apartment/${id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
 
       if (!response.ok) {
         throw new Error(`HTTP error! Status: ${response.status}`);
@@ -237,12 +290,6 @@ const FormEditRoom = ({ type, propertyDetails }: FormProps) => {
                     </FormControl>
                     <DatePicker
                       defaultValue={dayjs(formData.tenants[0].dob)}
-                      // onChange={(newValue) =>
-                      //   handleNestedFieldChange(
-                      //     "dob",
-                      //     newValue ? newValue.format() : ""
-                      //   )
-                      // }
                       onChange={(newValue) =>
                         handleFieldChange(
                           `tenants.0.dob`,
@@ -299,9 +346,6 @@ const FormEditRoom = ({ type, propertyDetails }: FormProps) => {
                     color="info"
                     variant="outlined"
                     value={formData.tenants[0].email}
-                    // onChange={(e) =>
-                    //   handleNestedFieldChange("email", e.target.value)
-                    // }
                     onChange={(e) =>
                       handleFieldChange(`tenants.0.email`, e.target.value)
                     }
@@ -360,13 +404,6 @@ const FormEditRoom = ({ type, propertyDetails }: FormProps) => {
                     </FormControl>
                     <DatePicker
                       defaultValue={dayjs(formData.contractEndDate)}
-                      // onChange={(newValue) =>
-                      //   handleFieldChange(
-                      //     "contractEndDate",
-                      //     newValue ? newValue.format() : ""
-                      //   )
-                      // }
-
                       onChange={(newValue) =>
                         handleFieldChange(
                           `contractEndDate`,
@@ -436,7 +473,7 @@ const FormEditRoom = ({ type, propertyDetails }: FormProps) => {
                 <div>
                   {formData.tenants[0].occupants.length > 0 ? (
                     formData.tenants[0].occupants.map((occupant, index) => (
-                      <>
+                      <div key={index}>
                         <Stack
                           key={index}
                           direction={isSmallScreen ? "column" : "row"}
@@ -532,11 +569,13 @@ const FormEditRoom = ({ type, propertyDetails }: FormProps) => {
                               color="#FCFCFC"
                               fullWidth
                               icon={<Delete />}
-                              handleClick={() => {}}
+                              handleClick={() => {
+                                handleDeleteOccupant(index);
+                              }}
                             />
                           </Box>
                         </Stack>
-                      </>
+                      </div>
                     ))
                   ) : (
                     <div>(There is no other occupant)</div>
@@ -548,7 +587,9 @@ const FormEditRoom = ({ type, propertyDetails }: FormProps) => {
                   backgroundColor="#40cf38"
                   color="#FCFCFC"
                   icon={<Add />}
-                  handleClick={() => {}}
+                  handleClick={() => {
+                    handleCreateOccupant(formData.tenants[0].occupants.length);
+                  }}
                 />
 
                 {/* 4. Vehicle Info */}
@@ -561,7 +602,7 @@ const FormEditRoom = ({ type, propertyDetails }: FormProps) => {
                 <div>
                   {formData.tenants[0].carModel.length > 0 ? (
                     formData.tenants[0].carModel.map((car, index) => (
-                      <>
+                      <div key={index}>
                         <Stack
                           direction={isSmallScreen ? "column" : "row"}
                           gap={4}
@@ -684,16 +725,28 @@ const FormEditRoom = ({ type, propertyDetails }: FormProps) => {
                               color="#FCFCFC"
                               fullWidth
                               icon={<Delete />}
-                              handleClick={() => {}}
+                              handleClick={() => {
+                                handleDeleteVehicle(index);
+                              }}
                             />
                           </Box>
                         </Stack>
-                      </>
+                      </div>
                     ))
                   ) : (
                     <div>(There is no vehicle.)</div>
                   )}
                 </div>
+
+                <CustomButton
+                  title={"Add vehicle"}
+                  backgroundColor="#40cf38"
+                  color="#FCFCFC"
+                  icon={<Add />}
+                  handleClick={() => {
+                    handleCreateVehicle(formData.tenants[0].carModel.length);
+                  }}
+                />
 
                 {/* 5. Credit Report */}
                 <Box mt={"20px"}>
@@ -710,6 +763,40 @@ const FormEditRoom = ({ type, propertyDetails }: FormProps) => {
                     handleClick={() => {}}
                   />
                 </Box>
+
+                {/* 6. Notes */}
+                <Box mt={"20px"}>
+                  <Typography fontSize={20} fontWeight={700}>
+                    {"6. Notes"}
+                  </Typography>
+                </Box>
+                <FormControl>
+                  <FormHelperText
+                    sx={{
+                      fontWeight: 500,
+                      margin: "10px 0",
+                      fontSize: 16,
+                      color: "#11142d",
+                    }}
+                  >
+                    {""}
+                  </FormHelperText>
+                  <TextareaAutosize
+                    minRows={5}
+                    required
+                    placeholder="Write description"
+                    color="info"
+                    style={{
+                      width: "100%",
+                      background: "transparent",
+                      borderColor: "rgba(0,0,0,0.23)",
+                      borderRadius: 6,
+                      padding: 10,
+                    }}
+                    value={formData.notes}
+                    onChange={(e) => handleFieldChange(`notes`, e.target.value)}
+                  />
+                </FormControl>
 
                 {/* Submit & Cancel buttons */}
                 <Stack
