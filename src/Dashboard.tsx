@@ -3,7 +3,6 @@ import { styled, createTheme, ThemeProvider } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import MuiDrawer from "@mui/material/Drawer";
-
 import MuiAppBar, { AppBarProps as MuiAppBarProps } from "@mui/material/AppBar";
 import Toolbar from "@mui/material/Toolbar";
 import List from "@mui/material/List";
@@ -11,19 +10,11 @@ import Typography from "@mui/material/Typography";
 import Divider from "@mui/material/Divider";
 import IconButton from "@mui/material/IconButton";
 import Badge from "@mui/material/Badge";
-import Container from "@mui/material/Container";
-import Grid from "@mui/material/Grid";
-import Paper from "@mui/material/Paper";
-import Link from "@mui/material/Link";
 import MenuIcon from "@mui/icons-material/Menu";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import NotificationsIcon from "@mui/icons-material/Notifications";
 import Box from "@mui/material/Box";
 import { mainListItems } from "./components/dashboard/listItems";
-import Chart from "./components/dashboard/Chart";
-import Deposits from "./components/dashboard/Deposits";
-import Orders from "./components/dashboard/Orders";
-import Dash from "./pages/dash";
 import Rooms from "./pages/rooms";
 import Applications from "./pages/applications";
 import Inventory from "./pages/inventory";
@@ -35,24 +26,8 @@ import Waitlist from "./pages/waitlist";
 import ApplicationDetails from "./pages/application-details";
 import InquiryDetails from "./pages/inquiry-details";
 import WaitlistDetails from "./pages/waitlist-details";
-
-// function Copyright(props: any) {
-//   return (
-//     <Typography
-//       variant="body2"
-//       color="text.secondary"
-//       align="center"
-//       {...props}
-//     >
-//       {"Copyright © "}
-//       <Link color="inherit" href="https://mui.com/">
-//         Your Website
-//       </Link>{" "}
-//       {new Date().getFullYear()}
-//       {"."}
-//     </Typography>
-//   );
-// }
+import { useDispatch } from "react-redux";
+import { updateAptTypeData } from "./store/aptTypeSlice";
 
 const drawerWidth: number = 240;
 
@@ -112,6 +87,28 @@ export default function Dashboard() {
   const toggleDrawer = () => {
     setOpen(!open);
   };
+  const dispatch = useDispatch();
+
+  React.useEffect(() => {
+    const fetchApartmentTypeData = async () => {
+      try {
+        const response = await fetch(
+          `http://localhost:3000/apartment/getAllAptType`
+        );
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        const data = await response.json();
+
+        // Set the mapped data to 'rows'
+        dispatch(updateAptTypeData(data));
+      } catch (error) {
+        console.error("Error fetching apartment Type data:", error);
+      }
+    };
+    fetchApartmentTypeData();
+  }, []);
+
 
   return (
     <Router>
@@ -198,10 +195,12 @@ export default function Dashboard() {
               <Route path="/rooms/create" element={<CreateRoom />} />
               <Route path="/rooms/show/:id" element={<RoomDetails />} />
               <Route path="/rooms/edit/:id" element={<EditRoom />} />
-              <Route path="/applications/:id" element={<ApplicationDetails />} />
+              <Route
+                path="/applications/:id"
+                element={<ApplicationDetails />}
+              />
               <Route path="/inquiries/:id" element={<InquiryDetails />} />
               <Route path="/waitlist/:id" element={<WaitlistDetails />} />
-
             </Routes>
           </Box>
         </Box>

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Box from "@mui/material/Box";
 import {
   IconButton,
@@ -7,13 +7,21 @@ import {
   Switch,
   Typography,
 } from "@mui/material";
-import { DataGrid, GridColDef, GridRowParams, GridValueGetterParams } from "@mui/x-data-grid";
+import {
+  DataGrid,
+  GridColDef,
+  GridRowParams,
+  GridValueGetterParams,
+} from "@mui/x-data-grid";
 import { Filter, CurrentFilterValues } from "../interfaces/property";
 import DeleteIcon from "@mui/icons-material/Delete";
-import { useNavigate } from "react-router-dom"; 
+import { useNavigate } from "react-router-dom";
 import { Type } from "../interfaces/common";
 import Chip from "../components/common/Chip";
-
+import { useDispatch } from "react-redux";
+import { updateApplicationData } from "../store/applicationSlice";
+import { ApplicationData } from "../interfaces/application";
+import ChipNew from "../components/common/ChipNew";
 
 const columns: GridColDef[] = [
   { field: "applicantName", headerName: "Applicant name", width: 150 },
@@ -22,7 +30,7 @@ const columns: GridColDef[] = [
     headerName: "Type",
     width: 150,
     renderCell: (params) => {
-      return <Chip type={params.row.type} marginLeft={"0"} />;
+      return <ChipNew typeId={params.row.typeId} marginLeft={"0"} />;
     },
   },
   {
@@ -45,7 +53,7 @@ const columns: GridColDef[] = [
   },
 ];
 
-const rows = [
+const applicationData = [
   {
     id: 1,
     applicantName: "John Doe",
@@ -121,15 +129,46 @@ const rows = [
 ];
 
 function Applications() {
+  const [applicationData, setApplicationData] = useState<ApplicationData[]>([]);
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+
+  // 1. Fetch all applications
+  useEffect(() => {
+    const fetchApplicationData = async () => {
+      try {
+        const response = await fetch(`http://localhost:3000/application/`);
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        const data = await response.json();
+        dispatch(updateApplicationData(data));
+
+        // Map the data from the endpoint to the 'applicationData' array format
+        const mappedData = data.map((item: ApplicationData, index: number) => ({
+          id: index + 1,
+          applicantName: `${item.firstName} ${item.lastName}`,
+          typeId: item.aptTypeId,
+          submissionDate: new Date(item.applicationDate).toLocaleDateString(),
+          moveinDate: new Date(item.moveInDate).toLocaleDateString(),
+          openhouseVisit: item.shownApt,
+          _id: item._id,
+        }));
+
+        // Set the mapped data to 'applicationData'
+        setApplicationData(mappedData);
+      } catch (error) {
+        console.error("Error fetching inquiry data:", error);
+      }
+    };
+
+    fetchApplicationData();
+  }, []);
 
   const handleRowClick = (params: GridRowParams) => {
-    // console.log(params)
     const pathName = window.location.pathname;
-    // console.log("path::",pathName)
     // Redirect the user to a different page with the row ID as a parameter
-    navigate(`${pathName}${params.row.id}`);
-    // console.log("path2::",`${pathName}/${params.row.id}`)
+    navigate(`${pathName}${params.row._id}`);
   };
 
   const setFilters = (newFilter: Filter) => {
@@ -212,7 +251,7 @@ function Applications() {
 
           {/* DATA TABLE */}
           <DataGrid
-            rows={rows}
+            rows={applicationData}
             columns={[...columns, actionColumn]}
             onRowClick={handleRowClick}
             initialState={{

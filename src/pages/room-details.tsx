@@ -30,13 +30,6 @@ import {
 import formatDate from "../components/common/DateFormatter";
 import DescriptionCard from "../components/common/DescriptionCard";
 
-const mockInquiryQuestionInfo = [
-  {
-    Question:
-      "Could you please clarify which utilities are included in the rental, such as cable TV, wifi, electricity, and any other services? Understanding the utility coverage will help me plan and budget accordingly for my stay in the property. Your clarification on this matter would be greatly appreciated. Thank you.",
-  },
-];
-
 const RoomDetails = () => {
   const navigate = useNavigate();
   const { id } = useParams();
@@ -67,32 +60,6 @@ const RoomDetails = () => {
 
     fetchApartmentData();
   }, []);
-
-  // // Fetch apartment type data using apartmentType ID
-  // useEffect(() => {
-  //   if (apartmentData) {
-  //     const apartmentTypeId = apartmentData.apartmentType;
-
-  //     if (apartmentTypeId) {
-  //       const fetchApartmentTypeData = async () => {
-  //         try {
-  //           const response = await fetch(
-  //             `http://localhost:3000/apartment/apartment-type/${apartmentTypeId}`
-  //           );
-  //           if (!response.ok) {
-  //             throw new Error(`HTTP error! Status: ${response.status}`);
-  //           }
-  //           const data = await response.json();
-  //           setApartmentTypeData(data);
-  //         } catch (error) {
-  //           console.error("Error fetching apartment type data:", error);
-  //         }
-  //       };
-
-  //       fetchApartmentTypeData();
-  //     }
-  //   }
-  // }, [apartmentData]);
 
   // Create a separate function to process the apartment data and set state
   const processApartmentData = (data: ApartmentData) => {
@@ -130,6 +97,8 @@ const RoomDetails = () => {
       };
     });
 
+    console.log('mockOtherOccupants::',mockOtherOccupants)
+
     const mockVehicleInfo = carModels.map((carModel) => ({
       Make: carModel.make,
       Model: carModel.model,
@@ -150,15 +119,6 @@ const RoomDetails = () => {
       processApartmentData(apartmentData);
     }
   }, [apartmentData]);
-
-  // // Mock function for useShow (fetching property details)
-  // const queryResult = {
-  //   data: mockRooms,
-  //   isLoading: false,
-  //   isError: false,
-  // };
-
-  // const { data, isLoading, isError } = queryResult;
 
   // Mock function for useDelete (deleting property)
   const mutate = async ({ resource, id }: { resource: string; id: string }) => {

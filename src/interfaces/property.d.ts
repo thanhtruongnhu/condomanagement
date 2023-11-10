@@ -1,5 +1,6 @@
 import dayjs, { Dayjs } from "dayjs";
 import { DataItem } from "./common";
+import { Interests } from "@mui/icons-material";
 
 export interface FormFieldProp {
   title: string;
@@ -115,4 +116,26 @@ export interface ApartmentData {
 export interface putData {
   aptAvailability: boolean;
   aptAvailableFrom: string;
+}
+
+export interface InquiryData {
+  firstName: string;
+  lastName: string;
+  email: string;
+  phoneNumber: string;
+  inquiryMessage: string;
+  inquiryDate: string;
+  _id: string;
+  aptTypeId: string;
+}
+
+export interface WaitlistData {
+  firstName: string;
+  lastName: string;
+  email: string;
+  phoneNumber: string;
+  message: string;
+  waitlistedDate: string;
+  _id: string;
+  aptTypeId: string;
 }

@@ -1,7 +1,8 @@
 import { Box, Typography } from "@mui/material";
-import { Type } from "../../interfaces/common";
+import { Type, TypeNew } from "../../interfaces/common";
+import getAptType from "./getAptType";
 
-function Chip({ type, marginLeft }: Type) {
+function ChipNew({ typeId, marginLeft }: TypeNew) {
   const selectBackgroundColor = (type: string) => {
     switch (type) {
       case "Single A":
@@ -36,6 +37,7 @@ function Chip({ type, marginLeft }: Type) {
     }
   };
 
+  const type = getAptType(typeId);
   const chipBackgroundColor = selectBackgroundColor(type);
   const chipTextColor = selectTextColor(type);
   return (
@@ -54,4 +56,4 @@ function Chip({ type, marginLeft }: Type) {
   );
 }
 
-export default Chip;
+export default ChipNew;

@@ -15,208 +15,34 @@ import InfoCard from "../components/common/InfoCard";
 import { CloudDownloadRounded } from "@mui/icons-material";
 import Chip from "../components/common/Chip";
 import ApplicationInfoCard from "../components/common/ApplicationInfoCard";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
+import { selectApplicationData } from "../store/applicationSlice";
+import ChipNew from "../components/common/ChipNew";
+import {
+  Address,
+  ApplicationData,
+} from "../interfaces/application";
+import formatDate from "../components/common/DateFormatter";
+import { DataItem } from "../interfaces/common";
 
-const mockRooms = [
-  {
-    _id: "1",
-    title: "Room 101",
-    propertyType: "Single A",
-    price: 100,
-    location: "Sample Location 1",
-    description:
-      "Classic comforts meets contemporary luxury overlooking the courtyard. Explore the best single household unit. Suitable for individual professional and student.",
-    photo: SingleSuitA,
-    creator: {
-      name: "John Doe",
-      avatar: "https://example.com/avatar1.jpg",
-      allProperties: [1, 2, 3],
-    },
-  },
-  {
-    _id: "2",
-    title: "Room 202",
-    propertyType: "Single B",
-    price: 150,
-    location: "Sample Location 2",
-    description:
-      "Classic comforts meets contemporary luxury overlooking the courtyard. Explore the best single household unit. Suitable for individual professional and student.",
-    photo: SingleSuitA,
-    creator: {
-      name: "Jane Doe",
-      avatar: "https://example.com/avatar2.jpg",
-      allProperties: [4, 5, 6],
-    },
-  },
-  {
-    _id: "3",
-    title: "Room 203",
-    propertyType: "Double A",
-    price: 150,
-    location: "Sample Location 2",
-    description:
-      "Classic comforts meets contemporary luxury overlooking the courtyard. Explore the best single household unit. Suitable for individual professional and student.",
-    photo: SingleSuitA,
-    creator: {
-      name: "Jack Doe",
-      avatar: "https://example.com/avatar2.jpg",
-      allProperties: [4, 5, 6],
-    },
-  },
-  {
-    _id: "4",
-    title: "Room 204",
-    propertyType: "Double B",
-    price: 150,
-    location: "Sample Location 2",
-    description:
-      "Classic comforts meets contemporary luxury overlooking the courtyard. Explore the best single household unit. Suitable for individual professional and student.",
-    photo: SingleSuitA,
-    creator: {
-      name: "Jix Doe",
-      avatar: "https://example.com/avatar2.jpg",
-      allProperties: [4, 5, 6],
-    },
-  },
-  {
-    _id: "5",
-    title: "Room 205",
-    propertyType: "Double C",
-    price: 150,
-    location: "Sample Location 2",
-    description:
-      "Classic comforts meets contemporary luxury overlooking the courtyard. Explore the best single household unit. Suitable for individual professional and student.",
-    photo: SingleSuitA,
-    creator: {
-      name: "Joe Doe",
-      avatar: "https://example.com/avatar2.jpg",
-      allProperties: [4, 5, 6],
-    },
-  },
-];
-
-const mockTenantInfo = [
-  {
-    "First Name": "John",
-    "Last Name": "Doe",
-    "Date of birth": "12/09/1998",
-    "Driver license #": "PE2930400343",
-    Province: "PEI",
-    "Phone number": "9029019xxx",
-    "Email Address": "john.doe@example.com",
-    "Desired move-in date": "12/09/2024",
-  },
-];
-
-const mockRentalHistoryInfo = [
-  {
-    "CURRENT ADDRESS": "",
-    "No.": "11",
-    "Street Name": "University Avenue",
-    Citi: "Charlottetown",
-    Province: "PEI",
-    "Postal code": "C1A 3R5",
-    "Since (MM/DD/YYYY)": "11/30/2021",
-    "To (MM/DD/YYYY)": "11/30/2023",
-  },
-  {
-    "CURRENT LANDLORD": "",
-    "First Name": "Moores",
-    "Last Name": "(902) 312 1234",
-    Phone: "Charlottetown",
-    Email: "john.doe@example.com",
-  },
-  {
-    ANSWERS: "",
-    "Have you given notice?": "Yes",
-    "Have you been asked to leave?": "No",
-    "Reason for leaving this property":
-      "I'm leaving my current property as I'm relocating for work. I assure you it's well-maintained, and I've been a responsible tenant. Feel free to contact my current landlord for reference.",
-    "Have you been evicted from a rental residence?": "No",
-    "Have you missed rental payments in the past 12 months?": "Yes",
-    "Have you ever refused to pay rent when due?": "No",
-    "If you have answered YES to any of the above, please state your reasons and/or circumstances":
-      "I'm leaving my current property as I'm relocating for work. I assure you it's well-maintained, and I've been a responsible tenant. Feel free to contact my current landlord for reference.",
-  },
-];
-
-const mockOtherOccupants = [
-  {
-    "Tenant name": "Jane Doe",
-    "Date of birth": "September 12th, 1988",
-    "Relation to main tenant": "Spouse",
-  },
-  {
-    "Tenant name": "Jinx Doe",
-    "Date of birth": "September 12th, 1988",
-    "Relation to main tenant": "Daughter",
-  },
-  {
-    "Tenant name": "Jack Doe",
-    "Date of birth": "September 12th, 1988",
-    "Relation to main tenant": "Son",
-  },
-];
-
-const mockVehicleInfo = [
-  {
-    Make: "Honda",
-    Model: "Civic Sedan 4 door",
-    Color: "Blue",
-    "License plate #": "DOLY-389",
-  },
-  {
-    Make: "Toyota",
-    Model: "Camry Hatchback",
-    Color: "Black",
-    "License plate #": "COLY-389",
-  },
-];
-
-const mockEmploymentInfo = [
-  {
-    "Employment status": "Full-time",
-    Employer: "Moores",
-    "Since (MM/DD/YY)": "12/30/2014",
-    "Street/City": "University Avenue",
-    Province: "PEI",
-    "Postion/Title": "Technician",
-    "Work Supervisor": "Jack Smith",
-    Phone: "(902)-556-9909",
-    "Other source of income": "No",
-  },
-];
-
-const mockReferenceInfo = [
-  {
-    "Full Name": "Azuki Doe",
-    "Relation to applicant": "Co-worker",
-    Phone: "(902)-556-9909",
-    "Email address": "azuki.doe@example.com",
-  },
-];
-
-const mockEmergencyContactInfo = [
-  {
-    "Next of kin": "Amanda Doe",
-    Phone: "(902)-556-9909",
-    Address: "11 Windsor st, Charlottetown, PEI",
-  },
-];
+function booleanToYesNo(value: boolean): string {
+  return value ? "Yes" : "No";
+}
 
 const ApplicationDetails = () => {
   const navigate = useNavigate();
   const { id } = useParams();
-  const [openhouseVisit, setOpenhouseVisit] = useState<boolean>(true);
-
-  // Mock function for useShow (fetching property details)
-  const queryResult = {
-    data: mockRooms,
-    isLoading: false,
-    isError: false,
-  };
-
-  const { data, isLoading, isError } = queryResult;
+  const applicationData = useSelector(selectApplicationData);
+  const [openhouseVisit, setOpenhouseVisit] = useState<boolean>(false);
+  const [tenantInfo, setTenantInfo] = useState<DataItem[]>([]);
+  const [rentalHistoryInfo, setRentalHistoryInfo] = useState<DataItem[]>([]);
+  const [otherOccupants, setOtherOccupants] = useState<DataItem[]>([]);
+  const [questions, setQuestions] = useState<DataItem[]>([]);
+  const [vehicleInfo, setVehicleInfo] = useState<DataItem[]>([]);
+  const [employmentInfo, setEmploymentInfo] = useState<DataItem[]>([]);
+  const [referenceInfo, setReferenceInfo] = useState<DataItem[]>([]);
+  const [emergencyContactInfo, setEmergencyContactInfo] = useState<DataItem[]>([]);
 
   // Mock function for useDelete (deleting property)
   const mutate = async ({ resource, id }: { resource: string; id: string }) => {
@@ -224,25 +50,150 @@ const ApplicationDetails = () => {
     console.log(`Deleted property with ID: ${id}`);
   };
 
-  //   const propertyDetails = queryResult.data;
-
   // Find the room details by matching the ID
-  const propertyDetails = queryResult.data.find(
-    (room: Room) => room._id === id
-  );
+  const applicationDetails = !applicationData
+    ? null
+    : applicationData.find((room: Room) => room._id === id);
 
-  if (!propertyDetails) {
+  if (!applicationDetails) {
     // Handle the case where the room with the specified ID is not found
     return <div>Application not found</div>;
   }
 
-  if (isLoading) {
-    return <div>Loading...</div>;
-  }
+  // Create a separate function to process the application data and set state
+  const processApplicationData = (data: ApplicationData) => {
+    // Tenant Info processing
+    const tenantInfo = [
+      {
+        "First Name": data.firstName,
+        "Last Name": data.lastName,
+        "Date of birth": formatDate(data.dob),
+        "Driver license #": data.driverLicense, //@Todo: remember to add in
+        Province: data.province, //@Todo: remember to add in
+        "Phone number": data.phoneNumber,
+        "Email Address": data.email,
+        "Desired move-in date": formatDate(data.moveInDate),
+      },
+    ];
 
-  if (isError) {
-    return <div>Something went wrong!</div>;
-  }
+    // Rental History processing
+    const rentalHistory = data.addresses;
+    const rentalHistoryInfo = rentalHistory.map((address) => {
+      return {
+        ADDRESS: "",
+        "No.": address.streetNo,
+        "Street Name": address.streetName,
+        Citi: address.city,
+        Province: address.province,
+        "Postal code": address.postalCode,
+        "Since (MM/DD/YYYY)": formatDate(address.since),
+        "To (MM/DD/YYYY)": formatDate(address.to),
+        LANDLORD: "",
+        "First Name": address.landlord.firstName,
+        "Last Name": address.landlord.lastName,
+        Phone: address.landlord.phone,
+        Email: address.landlord.email,
+        ANSWERS: "",
+        "Have you given notice?": booleanToYesNo(address.hasGivenNotice),
+        "Have you been asked to leave?": booleanToYesNo(
+          address.hasBeenAskedToLeave
+        ),
+        "Are you the person who pay the rental for this property?":
+          booleanToYesNo(address.paysRent),
+        "Reason for leaving this property": address.reasonForLeaving,
+      };
+    });
+
+    // Occupant processing
+    const occupants = data.occupants;
+    const otherOccupants = occupants.map((occupant) => {
+      return {
+        "Tenant name": occupant.name,
+        "Date of birth": formatDate(occupant.dob),
+        "Relation to main tenant": occupant.relationToApplicant,
+      };
+    });
+
+    const questions = [
+      {
+        "ADDITIONAL QUESTIONS": "",
+        "Have you been evicted from a rental residence?": booleanToYesNo(
+          data.beenEvicted
+        ),
+        "Have you missed rental payments in the past 12 months?":
+          booleanToYesNo(data.missedPayment),
+        "Have you ever refused to pay rent when due?": booleanToYesNo(
+          data.refusedToPay
+        ),
+        "If you have answered YES to any of the above, please state your reasons and/or circumstances":
+          data.reason,
+      },
+    ];
+
+    // vehicle info
+    const vehicle = data.carModel;
+    const vehicleInfo = [
+      {
+        Make: vehicle.make,
+        Model: vehicle.model,
+        Color: vehicle.color,
+        "License plate #": vehicle.licensePlate,
+      },
+    ];
+
+    //Employment info
+    const employment = data.employmentDetails;
+    const employmentInfo = [
+      {
+        "Employment status": employment.employmentStatus,
+        Employer: employment.employer,
+        "Since (MM/DD/YY)": formatDate(employment.since),
+        "Street/City": employment.streetCity,
+        Province: employment.province,
+        "Postion/Title": employment.positionTitle,
+        "Work Supervisor": employment.workSupervisor,
+        Phone: employment.workSupervisorPhone,
+        "Other source of income": employment.otherSourcesOfIncome,
+      },
+    ];
+
+    const reference = data.additionalReference;
+    const referenceInfo = [
+      {
+        "Full Name": reference.name,
+        "Relation to applicant": reference.relationship,
+        Phone: reference.phoneNumber,
+        "Email address": reference.email,
+      },
+    ];
+
+    const emergencyContact = data.emergencyContact;
+    const emergencyContactInfo = [
+      {
+        "Full Name": emergencyContact.name,
+        "Relation to applicant": emergencyContact.relationship,
+        Phone: emergencyContact.phoneNumber,
+        "Email address": emergencyContact.email,
+      },
+    ];
+
+    setOpenhouseVisit(data.shownApt);
+    setTenantInfo(tenantInfo);
+    setRentalHistoryInfo(rentalHistoryInfo);
+    setQuestions(questions);
+    setOtherOccupants(otherOccupants);
+    setVehicleInfo(vehicleInfo);
+    setEmploymentInfo(employmentInfo);
+    setReferenceInfo(referenceInfo);
+    setEmergencyContactInfo(emergencyContactInfo);
+  };
+
+  // Call the processing function when apartmentData changes
+  useEffect(() => {
+    if (applicationDetails) {
+      processApplicationData(applicationDetails);
+    }
+  }, [applicationDetails]);
 
   const handleDeleteProperty = () => {
     if (id) {
@@ -286,9 +237,9 @@ const ApplicationDetails = () => {
             fontWeight={700}
             color="#11142D"
           >
-            {propertyDetails.creator.name}
+            {`${applicationDetails.firstName} ${applicationDetails.lastName}`}
           </Typography>
-          <Chip type={propertyDetails.propertyType} marginLeft={"20px"} />
+          <ChipNew typeId={applicationDetails.aptTypeId} marginLeft={"20px"} />
         </Grid>
         <Box mr={"10px"}>
           <CustomButton
@@ -322,15 +273,17 @@ const ApplicationDetails = () => {
         setOpenhouseVisit={setOpenhouseVisit}
       />
 
-      <InfoCard title={"1. Personal Info"} data={mockTenantInfo} />
-      <InfoCard title={"2. Rental History"} data={mockRentalHistoryInfo} />
-      <InfoCard title={"3. Other Occupants"} data={mockOtherOccupants} />
-      <InfoCard title={"4. Vehicle Info"} data={mockVehicleInfo} />
-      <InfoCard title={"5. Employment"} data={mockEmploymentInfo} />
-      <InfoCard title={"6. Additional Reference"} data={mockReferenceInfo} />
+      <InfoCard title={"1. Personal Info"} data={tenantInfo} />
+      <InfoCard title={"2. Rental History"} data={rentalHistoryInfo} />
+      <InfoCard title={""} data={questions} />
+
+      <InfoCard title={"3. Other Occupants"} data={otherOccupants} />
+      <InfoCard title={"4. Vehicle Info"} data={vehicleInfo} />
+      <InfoCard title={"5. Employment"} data={employmentInfo} />
+      <InfoCard title={"6. Additional Reference"} data={referenceInfo} />
       <InfoCard
         title={"7. Emergency Contact"}
-        data={mockEmergencyContactInfo}
+        data={emergencyContactInfo}
       />
 
       {/* CreditReportCard */}

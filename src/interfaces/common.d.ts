@@ -70,10 +70,16 @@ export interface ApplicationInfoCardProps {
   setOpenhouseVisit: (value: boolean) => void; // Define the setOpenhouseVisit function
 }
 
-export interface Type {
+export interface Type { //Legacy
   type: string;
   marginLeft: string;
 }
+
+export interface TypeNew { //Recommended
+  typeId: string;
+  marginLeft: string;
+}
+
 
 export interface DataItem {
   [key: string]: string | undefined; // Define keys as strings and values as strings or undefined

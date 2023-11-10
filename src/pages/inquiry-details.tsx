@@ -9,122 +9,26 @@ import ForwardToInboxIcon from "@mui/icons-material/ForwardToInbox";
 
 import CustomButton from "../components/common/CustomButton";
 import SingleSuitA from "../assets/SingleSuite.jpg";
-import { Room } from "../interfaces/property";
+import { InquiryData, Room } from "../interfaces/property";
 import { Button, Container, Grid } from "@mui/material";
 import InfoCard from "../components/common/InfoCard";
 import { CloudDownloadRounded } from "@mui/icons-material";
 import Chip from "../components/common/Chip";
 import ApplicationInfoCard from "../components/common/ApplicationInfoCard";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import DescriptionCard from "../components/common/DescriptionCard";
-
-const mockRooms = [
-  {
-    _id: "1",
-    title: "Room 101",
-    propertyType: "Single A",
-    price: 100,
-    location: "Sample Location 1",
-    description:
-      "Classic comforts meets contemporary luxury overlooking the courtyard. Explore the best single household unit. Suitable for individual professional and student.",
-    photo: SingleSuitA,
-    creator: {
-      name: "John Doe",
-      avatar: "https://example.com/avatar1.jpg",
-      allProperties: [1, 2, 3],
-    },
-  },
-  {
-    _id: "2",
-    title: "Room 202",
-    propertyType: "Single B",
-    price: 150,
-    location: "Sample Location 2",
-    description:
-      "Classic comforts meets contemporary luxury overlooking the courtyard. Explore the best single household unit. Suitable for individual professional and student.",
-    photo: SingleSuitA,
-    creator: {
-      name: "Jane Doe",
-      avatar: "https://example.com/avatar2.jpg",
-      allProperties: [4, 5, 6],
-    },
-  },
-  {
-    _id: "3",
-    title: "Room 203",
-    propertyType: "Double A",
-    price: 150,
-    location: "Sample Location 2",
-    description:
-      "Classic comforts meets contemporary luxury overlooking the courtyard. Explore the best single household unit. Suitable for individual professional and student.",
-    photo: SingleSuitA,
-    creator: {
-      name: "Jack Doe",
-      avatar: "https://example.com/avatar2.jpg",
-      allProperties: [4, 5, 6],
-    },
-  },
-  {
-    _id: "4",
-    title: "Room 204",
-    propertyType: "Double B",
-    price: 150,
-    location: "Sample Location 2",
-    description:
-      "Classic comforts meets contemporary luxury overlooking the courtyard. Explore the best single household unit. Suitable for individual professional and student.",
-    photo: SingleSuitA,
-    creator: {
-      name: "Jix Doe",
-      avatar: "https://example.com/avatar2.jpg",
-      allProperties: [4, 5, 6],
-    },
-  },
-  {
-    _id: "5",
-    title: "Room 205",
-    propertyType: "Double C",
-    price: 150,
-    location: "Sample Location 2",
-    description:
-      "Classic comforts meets contemporary luxury overlooking the courtyard. Explore the best single household unit. Suitable for individual professional and student.",
-    photo: SingleSuitA,
-    creator: {
-      name: "Joe Doe",
-      avatar: "https://example.com/avatar2.jpg",
-      allProperties: [4, 5, 6],
-    },
-  },
-];
-
-const mockInquiryInfo = [
-  {
-    "Inquiry submission date": "12/09/2023",
-    "First Name": "John",
-    "Last Name": "Doe",
-    "Email Address": "john.doe@example.com",
-  },
-];
-
-const mockInquiryQuestionInfo = [
-  {
-    Question:
-      "Could you please clarify which utilities are included in the rental, such as cable TV, wifi, electricity, and any other services? Understanding the utility coverage will help me plan and budget accordingly for my stay in the property. Your clarification on this matter would be greatly appreciated. Thank you.",
-  },
-];
+import { useSelector } from "react-redux";
+import { selectInquiryData } from "../store/inquirySlice";
+import formatDate from "../components/common/DateFormatter";
+import { DataItem } from "../interfaces/common";
+import ChipNew from "../components/common/ChipNew";
 
 const InquiryDetails = () => {
   const navigate = useNavigate();
   const { id } = useParams();
-  const [openhouseVisit, setOpenhouseVisit] = useState<boolean>(true);
-
-  // Mock function for useShow (fetching property details)
-  const queryResult = {
-    data: mockRooms,
-    isLoading: false,
-    isError: false,
-  };
-
-  const { data, isLoading, isError } = queryResult;
+  const inquiryData = useSelector(selectInquiryData);
+  const [inquiryInfo, setInquiryInfo] = useState<DataItem[]>([]);
+  const [inquiryMessage, setInquiryMessage] = useState<DataItem[]>([]);
 
   // Mock function for useDelete (deleting property)
   const mutate = async ({ resource, id }: { resource: string; id: string }) => {
@@ -132,25 +36,38 @@ const InquiryDetails = () => {
     console.log(`Deleted property with ID: ${id}`);
   };
 
-  //   const propertyDetails = queryResult.data;
-
   // Find the room details by matching the ID
-  const propertyDetails = queryResult.data.find(
-    (room: Room) => room._id === id
-  );
+  const inquiryDetails = !inquiryData
+    ? null
+    : inquiryData.find((room: Room) => room._id === id);
 
-  if (!propertyDetails) {
+  if (!inquiryDetails) {
     // Handle the case where the room with the specified ID is not found
-    return <div>Application not found</div>;
+    return <div>Inquiry not found</div>;
   }
 
-  if (isLoading) {
-    return <div>Loading...</div>;
-  }
+  const processInquiryData = (data: InquiryData) => {
+    const inquiryInfo = [
+      {
+        "Inquiry submission date": formatDate(data.inquiryDate),
+        "First Name": data.firstName,
+        "Last Name": data.lastName,
+        "Email Address": data.email,
+        "Phone Number": data.phoneNumber,
+      },
+    ];
 
-  if (isError) {
-    return <div>Something went wrong!</div>;
-  }
+    const inquiryMessage = [{ Question: data.inquiryMessage }];
+
+    setInquiryInfo(inquiryInfo);
+    setInquiryMessage(inquiryMessage);
+  };
+
+  useEffect(() => {
+    if (inquiryDetails) {
+      processInquiryData(inquiryDetails);
+    }
+  }, [inquiryDetails]);
 
   const handleDeleteProperty = () => {
     if (id) {
@@ -194,9 +111,9 @@ const InquiryDetails = () => {
             fontWeight={700}
             color="#11142D"
           >
-            {propertyDetails.creator.name}
+            {`${inquiryDetails.firstName} ${inquiryDetails.lastName}`}
           </Typography>
-          <Chip type={propertyDetails.propertyType} marginLeft={"20px"} />
+          <ChipNew typeId={inquiryDetails.aptTypeId} marginLeft={"20px"} />
         </Grid>
         <Box mr={"10px"}>
           <CustomButton
@@ -206,7 +123,7 @@ const InquiryDetails = () => {
             fullWidth
             icon={<Delete />}
             handleClick={() => {
-              // navigate(`/rooms/edit/${propertyDetails._id}`);
+              // navigate(`/rooms/edit/${inquiryDetails._id}`);
             }}
           />
         </Box>
@@ -218,15 +135,15 @@ const InquiryDetails = () => {
             fullWidth
             icon={<ForwardToInboxIcon />}
             handleClick={() => {
-              // navigate(`/rooms/edit/${propertyDetails._id}`);
+              // navigate(`/rooms/edit/${inquiryDetails._id}`);
             }}
           />
         </Box>
       </Box>
 
-      <InfoCard title={""} data={mockInquiryInfo} />
+      <InfoCard title={""} data={inquiryInfo} />
       <Box pb={"60px"}>
-        <DescriptionCard data={mockInquiryQuestionInfo} />
+        <DescriptionCard data={inquiryMessage} />
       </Box>
     </Container>
   );

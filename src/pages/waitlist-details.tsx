@@ -9,14 +9,19 @@ import ForwardToInboxIcon from "@mui/icons-material/ForwardToInbox";
 
 import CustomButton from "../components/common/CustomButton";
 import SingleSuitA from "../assets/SingleSuite.jpg";
-import { Room } from "../interfaces/property";
+import { Room, WaitlistData } from "../interfaces/property";
 import { Button, Container, Grid } from "@mui/material";
 import InfoCard from "../components/common/InfoCard";
 import { CloudDownloadRounded } from "@mui/icons-material";
 import Chip from "../components/common/Chip";
 import ApplicationInfoCard from "../components/common/ApplicationInfoCard";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import DescriptionCard from "../components/common/DescriptionCard";
+import { useSelector } from "react-redux";
+import { selectWaitlistData } from "../store/waitlistSlice";
+import { DataItem } from "../interfaces/common";
+import formatDate from "../components/common/DateFormatter";
+import ChipNew from "../components/common/ChipNew";
 
 const mockRooms = [
   {
@@ -96,24 +101,24 @@ const mockRooms = [
   },
 ];
 
-const mockInquiryInfo = [
+const inquiryInfo = [
   {
     "Wait-list summission date": "11/20/2023",
     "Expected move-in date": "12/20/2023",
     "Full Name": "John Doe",
-    "Email": "john.doe@example.com",
-    "Phone": "(902) 345 8890",
+    Email: "john.doe@example.com",
+    Phone: "(902) 345 8890",
     "Street Address": "11 Windsor st",
     "Address line 2": "",
-    "City": "Charlottetown",
-    "Province": "PEI",
+    City: "Charlottetown",
+    Province: "PEI",
     "Postal code": "C1A 4E5",
-    "Ownership": "I rent this residence",
+    Ownership: "I rent this residence",
     "Where did you hear about us ": "Social Media",
   },
 ];
 
-const mockAdditionalInfo = [
+const additionalInfo = [
   {
     "Additional Information":
       "I am a dedicated and experienced professional teacher with a passion for education. With a proven track record of creating engaging learning environments and fostering academic growth in my students, I bring enthusiasm and expertise to the classroom. My commitment to excellence extends to my personal life as well, where I prioritize responsibility and respect for others. As a tenant, you can trust that I will maintain your property with care and adhere to all lease terms diligently. I look forward to the opportunity to be a responsible and dependable tenant in your property.",
@@ -123,16 +128,9 @@ const mockAdditionalInfo = [
 const WaitlistDetails = () => {
   const navigate = useNavigate();
   const { id } = useParams();
-  const [openhouseVisit, setOpenhouseVisit] = useState<boolean>(true);
-
-  // Mock function for useShow (fetching property details)
-  const queryResult = {
-    data: mockRooms,
-    isLoading: false,
-    isError: false,
-  };
-
-  const { data, isLoading, isError } = queryResult;
+  const waitlistData = useSelector(selectWaitlistData);
+  const [waitlistInfo, setWaitlistInfo] = useState<DataItem[]>([]);
+  const [waitlistMessage, setWaitlistMessage] = useState<DataItem[]>([]);
 
   // Mock function for useDelete (deleting property)
   const mutate = async ({ resource, id }: { resource: string; id: string }) => {
@@ -140,25 +138,40 @@ const WaitlistDetails = () => {
     console.log(`Deleted property with ID: ${id}`);
   };
 
-  //   const propertyDetails = queryResult.data;
-
   // Find the room details by matching the ID
-  const propertyDetails = queryResult.data.find(
-    (room: Room) => room._id === id
-  );
+  const waitlistDetails = !waitlistData
+    ? null
+    : waitlistData.find((room: Room) => room._id === id);
 
-  if (!propertyDetails) {
+  
+
+  if (!waitlistDetails) {
     // Handle the case where the room with the specified ID is not found
-    return <div>Application not found</div>;
+    return <div>Wait list info not found</div>;
   }
 
-  if (isLoading) {
-    return <div>Loading...</div>;
-  }
+  const processWaitlistData = (data: WaitlistData) => {
+    const waitlistInfo = [
+      {
+        "Inquiry submission date": formatDate(data.waitlistedDate),
+        "First Name": data.firstName,
+        "Last Name": data.lastName,
+        "Email Address": data.email,
+        "Phone Number": data.phoneNumber,
+      },
+    ];
 
-  if (isError) {
-    return <div>Something went wrong!</div>;
-  }
+    const waitlistMessage = [{ "Additional Information": data.message }];
+
+    setWaitlistInfo(waitlistInfo);
+    setWaitlistMessage(waitlistMessage);
+  };
+
+  useEffect(() => {
+    if (waitlistDetails) {
+      processWaitlistData(waitlistDetails);
+    }
+  }, [waitlistDetails]);
 
   const handleDeleteProperty = () => {
     if (id) {
@@ -202,9 +215,9 @@ const WaitlistDetails = () => {
             fontWeight={700}
             color="#11142D"
           >
-            {propertyDetails.creator.name}
+            {`${waitlistDetails.firstName} ${waitlistDetails.lastName}`}
           </Typography>
-          <Chip type={propertyDetails.propertyType} marginLeft={"20px"} />
+          <ChipNew typeId={waitlistDetails.aptTypeId} marginLeft={"20px"} />
         </Grid>
         <Box mr={"10px"}>
           <CustomButton
@@ -214,7 +227,7 @@ const WaitlistDetails = () => {
             fullWidth
             icon={<Delete />}
             handleClick={() => {
-              // navigate(`/rooms/edit/${propertyDetails._id}`);
+              // navigate(`/rooms/edit/${waitlistDetails._id}`);
             }}
           />
         </Box>
@@ -226,15 +239,15 @@ const WaitlistDetails = () => {
             fullWidth
             icon={<ForwardToInboxIcon />}
             handleClick={() => {
-              // navigate(`/rooms/edit/${propertyDetails._id}`);
+              // navigate(`/rooms/edit/${waitlistDetails._id}`);
             }}
           />
         </Box>
       </Box>
 
-      <InfoCard title={""} data={mockInquiryInfo} />
+      <InfoCard title={""} data={waitlistInfo} />
       <Box pb={"60px"}>
-        <DescriptionCard data={mockAdditionalInfo} />
+        <DescriptionCard data={waitlistMessage} />
       </Box>
     </Container>
   );

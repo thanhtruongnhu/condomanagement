@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Box from "@mui/material/Box";
 import {
   IconButton,
@@ -7,12 +7,22 @@ import {
   Switch,
   Typography,
 } from "@mui/material";
-import { DataGrid, GridColDef, GridValueGetterParams, GridRowParams } from "@mui/x-data-grid";
-import { Filter, CurrentFilterValues } from "../interfaces/property";
+import {
+  DataGrid,
+  GridColDef,
+  GridValueGetterParams,
+  GridRowParams,
+} from "@mui/x-data-grid";
+import {
+  Filter,
+  CurrentFilterValues,
+  InquiryData,
+} from "../interfaces/property";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { useNavigate } from "react-router-dom";
-import Chip from "../components/common/Chip";
-
+import ChipNew from "../components/common/ChipNew";
+import { useDispatch } from "react-redux";
+import { updateInquiryData } from "../store/inquirySlice";
 
 const columns: GridColDef[] = [
   { field: "inquirer", headerName: "Inquirer", width: 200 },
@@ -21,7 +31,7 @@ const columns: GridColDef[] = [
     headerName: "Type",
     width: 200,
     renderCell: (params) => {
-      return <Chip type={params.row.type} marginLeft={"0"} />;
+      return <ChipNew typeId={params.row.typeId} marginLeft={"0"} />;
     },
   },
   {
@@ -30,44 +40,53 @@ const columns: GridColDef[] = [
     width: 200,
     editable: false,
   },
-];
-
-const rows = [
-  { id: 1, inquirer: "John Doe", type: "Single A", inquiryDate: "10/28/2024" },
-  { id: 2, inquirer: "Jane Doe", type: "Single B", inquiryDate: "10/28/2024" },
-  { id: 3, inquirer: "Jake Doe", type: "Double A", inquiryDate: "10/28/2024" },
-  { id: 4, inquirer: "Jix Doe", type: "Double B", inquiryDate: "10/28/2024" },
-  { id: 5, inquirer: "Joe Doe", type: "Double C", inquiryDate: "10/28/2024" },
   {
-    id: 6,
-    inquirer: "Mary Moores",
-    type: "Single A",
-    inquiryDate: "10/28/2024",
-  },
-  {
-    id: 7,
-    inquirer: "Anne Moores",
-    type: "Single A",
-    inquiryDate: "10/28/2024",
-  },
-  { id: 8, inquirer: "Anne Doe", type: "Single B", inquiryDate: "10/28/2024" },
-  {
-    id: 9,
-    inquirer: "John Moores",
-    type: "Double C",
-    inquiryDate: "10/28/2024",
+    field: "_id",
+    headerName: "MongoDB ID",
+    width: 50,
+    editable: false,
   },
 ];
 
 function Inquiries() {
-
+  const [inquiryData, setInquiryData] = useState<InquiryData[]>([]);
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    const fetchInquiryData = async () => {
+      try {
+        const response = await fetch(`http://localhost:3000/inquiry/`);
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        const data = await response.json();
+        dispatch(updateInquiryData(data));
+
+        // Map the data from the endpoint to the 'rows' array format
+        const mappedData = data.map((item: InquiryData, index: number) => ({
+          id: index + 1,
+          inquirer: `${item.firstName} ${item.lastName}`,
+          typeId: item.aptTypeId,
+          inquiryDate: new Date(item.inquiryDate).toLocaleDateString(),
+          _id: item._id,
+        }));
+
+        // Set the mapped data to 'rows'
+        setInquiryData(mappedData);
+      } catch (error) {
+        console.error("Error fetching inquiry data:", error);
+      }
+    };
+
+    fetchInquiryData();
+  }, []);
 
   const handleRowClick = (params: GridRowParams) => {
     // console.log(params)
     const pathName = window.location.pathname;
     // Redirect the user to a different page with the row ID as a parameter
-    navigate(`${pathName}${params.row.id}`);
+    navigate(`${pathName}${params.row._id}`);
   };
 
   const setFilters = (newFilter: Filter) => {
@@ -76,7 +95,6 @@ function Inquiries() {
 
   const [currentFilterValues, setCurrentFilterValues] =
     useState<CurrentFilterValues>({});
-
 
   const actionColumn: GridColDef = {
     field: "delete",
@@ -115,54 +133,66 @@ function Inquiries() {
             All Inquiries
           </Typography>
 
-          {/* FILTER */}
-          <Select
-            // fullWidth
-            sx={{ width: "200px" }}
-            variant="outlined"
-            color="info"
-            displayEmpty
-            required
-            inputProps={{ "aria-label": "Without label" }}
-            defaultValue=""
-            value={currentFilterValues.propertyType || ""}
-            onChange={(e) => {
-              const newFilter = {
-                propertyType: e.target.value,
-              };
-              setFilters(newFilter);
-            }}
-          >
-            <MenuItem value="">All</MenuItem>
-            {[
-              "Single Suite A",
-              "Single Suite B ♿",
-              "Double Suite A",
-              "Double Suite B",
-              "Double Suite C",
-            ].map((type) => (
-              <MenuItem key={type} value={type.toLowerCase()}>
-                {type}
-              </MenuItem>
-            ))}
-          </Select>
+          {!inquiryData.length ? (
+            "There are no properties"
+          ) : (
+            <>
+              {/* FILTER */}
+              <Select
+                // fullWidth
+                sx={{ width: "200px" }}
+                variant="outlined"
+                color="info"
+                displayEmpty
+                required
+                inputProps={{ "aria-label": "Without label" }}
+                defaultValue=""
+                value={currentFilterValues.propertyType || ""}
+                onChange={(e) => {
+                  const newFilter = {
+                    propertyType: e.target.value,
+                  };
+                  setFilters(newFilter);
+                }}
+              >
+                <MenuItem value="">All</MenuItem>
+                {[
+                  "Single Suite A",
+                  "Single Suite B ♿",
+                  "Double Suite A",
+                  "Double Suite B",
+                  "Double Suite C",
+                ].map((type) => (
+                  <MenuItem key={type} value={type.toLowerCase()}>
+                    {type}
+                  </MenuItem>
+                ))}
+              </Select>
 
-          {/* DATA TABLE */}
-          <DataGrid
-            rows={rows}
-            columns={[...columns, actionColumn]}
-            onRowClick={handleRowClick}
-            initialState={{
-              pagination: {
-                paginationModel: {
-                  pageSize: 5,
-                },
-              },
-            }}
-            pageSizeOptions={[5]}
-            checkboxSelection
-            disableRowSelectionOnClick
-          />
+              {/* DATA TABLE */}
+              <DataGrid
+                rows={inquiryData}
+                columns={[...columns, actionColumn]}
+                onRowClick={handleRowClick}
+                initialState={{
+                  pagination: {
+                    paginationModel: {
+                      pageSize: 5,
+                    },
+                  },
+                  columns: {
+                    columnVisibilityModel: {
+                      // Hidden columns
+                      _id: false,
+                    },
+                  },
+                }}
+                pageSizeOptions={[5]}
+                checkboxSelection
+                disableRowSelectionOnClick
+              />
+            </>
+          )}
         </form>
       </Box>
     </Box>

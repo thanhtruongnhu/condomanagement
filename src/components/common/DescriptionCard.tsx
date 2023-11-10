@@ -30,7 +30,7 @@ function DescriptionCard({ data }: DescriptionCardProps) {
         const value = item[key];
 
         return (
-          <StyledTableContainer>
+          <StyledTableContainer key={key}>
             <Table>
               <TableBody>
                 {/* Title Row */}
