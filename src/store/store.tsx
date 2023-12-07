@@ -3,6 +3,7 @@ import aptTypeSlice from "./aptTypeSlice";
 import inquirySlice from "./inquirySlice";
 import applicationSlice from "./applicationSlice";
 import waitlistSlice from "./waitlistSlice";
+import tokenSlice from "./tokenSlice";
 
 export default configureStore({
   reducer: {
@@ -10,5 +11,6 @@ export default configureStore({
     inquiryData: inquirySlice,
     applicationData: applicationSlice,
     waitlistData: waitlistSlice,
+    tokenData: tokenSlice,
   },
 });

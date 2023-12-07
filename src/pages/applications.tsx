@@ -137,10 +137,28 @@ function Applications() {
   useEffect(() => {
     const fetchApplicationData = async () => {
       try {
-        const response = await fetch(`http://localhost:3000/application/`);
+        // Retrieve the token from localStorage
+        const token = localStorage.getItem("token");
+
+        // Check if the token is available
+        if (!token) {
+          console.error("Token not available. Please authenticate first.");
+          return;
+        }
+
+        // Fetch application data using your domain, including the token in the headers
+        const response = await fetch("https://globalsolusap.com/application/", {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        });
+
         if (!response.ok) {
           throw new Error(`HTTP error! Status: ${response.status}`);
         }
+
         const data = await response.json();
         dispatch(updateApplicationData(data));
 
@@ -158,7 +176,7 @@ function Applications() {
         // Set the mapped data to 'applicationData'
         setApplicationData(mappedData);
       } catch (error) {
-        console.error("Error fetching inquiry data:", error);
+        console.error("Error fetching application data:", error);
       }
     };
 

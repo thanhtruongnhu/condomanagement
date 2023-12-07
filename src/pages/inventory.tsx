@@ -74,12 +74,28 @@ function Inventory() {
   useEffect(() => {
     const fetchApartmentData = async () => {
       try {
-        const response = await fetch(`http://localhost:3000/apartment/`);
+        // Retrieve the token from localStorage
+        const token = localStorage.getItem('token');
+  
+        // Check if the token is available
+        if (!token) {
+          console.error('Token not available. Please authenticate first.');
+          return;
+        }
+  
+        // Fetch apartment data using your domain, including the token in the headers
+        const response = await fetch('https://globalsolusap.com/apartment/', {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+  
         if (!response.ok) {
           throw new Error(`HTTP error! Status: ${response.status}`);
         }
+  
         const data = await response.json();
-
+  
         // Map the data from the endpoint to the 'rows' array format
         const mappedData = data.map((item: ApartmentData, index: number) => ({
           id: index + 1,
@@ -87,18 +103,18 @@ function Inventory() {
           type: item.apartmentType.aptCode,
           availableDate: item.aptAvailableFrom
             ? new Date(item.aptAvailableFrom).toLocaleDateString()
-            : "Not Available",
+            : 'Not Available',
           _id: item._id,
           aptAvailability: item.aptAvailability,
         }));
-
+  
         // Set the mapped data to 'rows'
         setApartmentData(mappedData);
       } catch (error) {
-        console.error("Error fetching apartment data:", error);
+        console.error('Error fetching apartment data:', error);
       }
     };
-
+  
     fetchApartmentData();
   }, [updatedData]);
 
@@ -111,27 +127,37 @@ function Inventory() {
 
   // Function to handle the PUT request
   const handleUpdateRoom = async (putData: putData, roomId: string) => {
-    // event.preventDefault(); // Prevent the default form submission
-
     try {
+      // Retrieve the token from localStorage
+      const token = localStorage.getItem('token');
+  
+      // Check if the token is available
+      if (!token) {
+        console.error('Token not available. Please authenticate first.');
+        return;
+      }
+  
+      // Fetch room update using your domain, including the token in the headers
       const response = await fetch(
-        `http://localhost:3000/apartment/update-availability/${roomId}`,
+        `https://globalsolusap.com/apartment/update-availability/${roomId}`,
         {
           method: "PUT",
           headers: {
             "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
           },
           body: JSON.stringify(putData),
         }
       );
-
+  
       if (!response.ok) {
         throw new Error(`HTTP error! Status: ${response.status}`);
       }
     } catch (error) {
-      console.error("Error fetching apartment type data:", error);
+      console.error("Error updating room data:", error);
     }
   };
+  
 
   const actionColumn: GridColDef = {
     field: "availableforrent",

@@ -56,10 +56,28 @@ function Inquiries() {
   useEffect(() => {
     const fetchInquiryData = async () => {
       try {
-        const response = await fetch(`http://localhost:3000/inquiry/`);
+        // Retrieve the token from localStorage
+        const token = localStorage.getItem("token");
+
+        // Check if the token is available
+        if (!token) {
+          console.error("Token not available. Please authenticate first.");
+          return;
+        }
+
+        // Fetch inquiry data using your domain, including the token in the headers
+        const response = await fetch("https://globalsolusap.com/inquiry/", {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        });
+
         if (!response.ok) {
           throw new Error(`HTTP error! Status: ${response.status}`);
         }
+
         const data = await response.json();
         dispatch(updateInquiryData(data));
 

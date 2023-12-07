@@ -26,8 +26,10 @@ import Waitlist from "./pages/waitlist";
 import ApplicationDetails from "./pages/application-details";
 import InquiryDetails from "./pages/inquiry-details";
 import WaitlistDetails from "./pages/waitlist-details";
-import { useDispatch } from "react-redux";
-import { updateAptTypeData } from "./store/aptTypeSlice";
+import { useDispatch, useSelector } from "react-redux";
+import { updateToken, clearToken } from "./store/tokenSlice"; // Adjust the path accordingly
+import { selectAptTypeData, updateAptTypeData } from "./store/aptTypeSlice";
+import { Navigation } from "./components/layout/Navigation";
 
 const drawerWidth: number = 240;
 
@@ -84,6 +86,9 @@ const defaultTheme = createTheme();
 
 export default function Dashboard() {
   const [open, setOpen] = React.useState(true);
+  const aptTypeData = useSelector(selectAptTypeData);
+  const token = localStorage.getItem("token"); // Adjust the state structure accordingly
+
   const toggleDrawer = () => {
     setOpen(!open);
   };
@@ -93,84 +98,41 @@ export default function Dashboard() {
     const fetchApartmentTypeData = async () => {
       try {
         const response = await fetch(
-          `http://localhost:3000/apartment/getAllAptType`
+          "https://globalsolusap.com/apartment/getAllAptType",
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`, // Include the token in the Authorization header
+            },
+          }
         );
+
         if (!response.ok) {
           throw new Error(`HTTP error! Status: ${response.status}`);
         }
-        const data = await response.json();
 
+        const data = await response.json();
         // Set the mapped data to 'rows'
         dispatch(updateAptTypeData(data));
       } catch (error) {
         console.error("Error fetching apartment Type data:", error);
+        // Handle errors, possibly clear token if unauthorized, etc.
+        dispatch(clearToken());
       }
     };
-    fetchApartmentTypeData();
+
+    if (token) {
+      fetchApartmentTypeData();
+    }
   }, []);
 
-
   return (
-    <Router>
+    aptTypeData && (
       <ThemeProvider theme={defaultTheme}>
         <Box sx={{ display: "flex" }}>
           <CssBaseline />
-
-          {/* Header */}
-          <AppBar position="absolute" open={open}>
-            <Toolbar
-              sx={{
-                pr: "24px", // keep right padding when drawer closed
-              }}
-            >
-              <IconButton
-                edge="start"
-                color="inherit"
-                aria-label="open drawer"
-                onClick={toggleDrawer}
-                sx={{
-                  marginRight: "36px",
-                  ...(open && { display: "none" }),
-                }}
-              >
-                <MenuIcon />
-              </IconButton>
-              <Typography
-                component="h1"
-                variant="h6"
-                color="inherit"
-                noWrap
-                sx={{ flexGrow: 1 }}
-              >
-                {/* Main Interface */}
-              </Typography>
-              <IconButton color="inherit">
-                <Badge badgeContent={4} color="secondary">
-                  <NotificationsIcon />
-                </Badge>
-              </IconButton>
-            </Toolbar>
-          </AppBar>
-
-          {/* Drawer */}
-          <Drawer variant="permanent" open={open}>
-            <Toolbar
-              sx={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "flex-end",
-                px: [1],
-              }}
-            >
-              <IconButton onClick={toggleDrawer}>
-                <ChevronLeftIcon />
-              </IconButton>
-            </Toolbar>
-            <Divider />
-            <List component="nav">{mainListItems}</List>
-          </Drawer>
-
-          {/* Main Display container */}
+          <Navigation />
           <Box
             component="main"
             sx={{
@@ -205,6 +167,6 @@ export default function Dashboard() {
           </Box>
         </Box>
       </ThemeProvider>
-    </Router>
+    )
   );
 }

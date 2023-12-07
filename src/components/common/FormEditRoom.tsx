@@ -139,23 +139,34 @@ const FormEditRoom = ({ type, propertyDetails }: FormProps) => {
 
   // Function to handle the PUT request
   const handleUpdateRoom = async () => {
-    // event.preventDefault(); // Prevent the default form submission
-
-    console.log("roomData::", formData);
     try {
-      const response = await fetch(`http://localhost:3000/apartment/${id}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(formData),
-      });
+      // Retrieve the token from localStorage
+      const token = localStorage.getItem("token");
+
+      // Check if the token is available
+      if (!token) {
+        console.error("Token not available. Please authenticate first.");
+        return;
+      }
+
+      // Fetch room update using your domain, including the token in the headers
+      const response = await fetch(
+        `https://globalsolusap.com/apartment/${id}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(formData),
+        }
+      );
 
       if (!response.ok) {
         throw new Error(`HTTP error! Status: ${response.status}`);
       }
     } catch (error) {
-      console.error("Error fetching apartment type data:", error);
+      console.error("Error updating room data:", error);
     }
   };
 

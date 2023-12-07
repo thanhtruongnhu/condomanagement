@@ -21,10 +21,29 @@ const EditRoom = () => {
   useEffect(() => {
     const fetchApartmentData = async () => {
       try {
-        const response = await fetch(`http://localhost:3000/apartment/${id}`);
+        // Retrieve the token from localStorage
+        const token = localStorage.getItem("token");
+
+        // Check if the token is available
+        if (!token) {
+          console.error("Token not available. Please authenticate first.");
+          return;
+        }
+
+        // Fetch apartment data using your domain, including the token in the headers
+        const response = await fetch(
+          `https://globalsolusap.com/apartment/${id}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
         if (!response.ok) {
           throw new Error(`HTTP error! Status: ${response.status}`);
         }
+
         const data = await response.json();
         setApartmentData(data);
       } catch (error) {
@@ -33,9 +52,13 @@ const EditRoom = () => {
     };
 
     fetchApartmentData();
-  }, []);
+  }, [id]);
 
-  return <FormEditRoom type="Edit" propertyDetails={apartmentData} />;
+  return (
+    apartmentData && (
+      <FormEditRoom type="Edit" propertyDetails={apartmentData} />
+    )
+  );
 };
 
 export default EditRoom;
