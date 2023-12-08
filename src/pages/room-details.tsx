@@ -38,6 +38,7 @@ const RoomDetails = () => {
   );
   const [apartmentTypeData, setApartmentTypeData] =
     useState<ApartmentType | null>(null);
+  const [documentName, setDocumentName] = useState();
   const [mockTenantInfo, setMockTenantInfo] = useState<DataItem[]>([]);
   const [mockOtherOccupants, setMockOtherOccupants] = useState<DataItem[]>([]);
   const [mockVehicleInfo, setMockVehicleInfo] = useState<DataItem[]>([]);
@@ -48,20 +49,23 @@ const RoomDetails = () => {
     const fetchApartmentData = async () => {
       try {
         // Retrieve the token from localStorage
-        const token = localStorage.getItem('token');
+        const token = localStorage.getItem("token");
 
         // Check if the token is available
         if (!token) {
-          console.error('Token not available. Please authenticate first.');
+          console.error("Token not available. Please authenticate first.");
           return;
         }
 
         // Fetch apartment data using your domain, including the token in the headers
-        const response = await fetch(`https://globalsolusap.com/apartment/${id}`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
+        const response = await fetch(
+          `https://globalsolusap.com/apartment/${id}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
 
         if (!response.ok) {
           throw new Error(`HTTP error! Status: ${response.status}`);
@@ -69,6 +73,9 @@ const RoomDetails = () => {
 
         const data = await response.json();
         setApartmentData(data);
+        if (data.creditReport) {
+          setDocumentName(data.creditReport.documentName);
+        }
       } catch (error) {
         console.error("Error fetching apartment data:", error);
       }
@@ -113,7 +120,7 @@ const RoomDetails = () => {
       };
     });
 
-    console.log('mockOtherOccupants::',mockOtherOccupants)
+    console.log("mockOtherOccupants::", mockOtherOccupants);
 
     const mockVehicleInfo = carModels.map((carModel) => ({
       Make: carModel.make,

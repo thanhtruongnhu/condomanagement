@@ -79,77 +79,11 @@ const columns: GridColDef[] = [
   },
 ];
 
-const rows = [
-  {
-    id: 1,
-    waitlistApplicant: "John Doe",
-    type: "Single A",
-    contactDate: "10/28/2024",
-    waittime: "2 months",
-  },
-  {
-    id: 2,
-    waitlistApplicant: "Jane Doe",
-    type: "Single B",
-    contactDate: "10/28/2024",
-    waittime: "2 months",
-  },
-  {
-    id: 3,
-    waitlistApplicant: "Jake Doe",
-    type: "Double A",
-    contactDate: "10/28/2024",
-    waittime: "3 months",
-  },
-  {
-    id: 4,
-    waitlistApplicant: "Jix Doe",
-    type: "Double B",
-    contactDate: "10/28/2024",
-    waittime: "1 year",
-  },
-  {
-    id: 5,
-    waitlistApplicant: "Joe Doe",
-    type: "Double C",
-    contactDate: "10/28/2024",
-    waittime: "1 month",
-  },
-  {
-    id: 6,
-    waitlistApplicant: "Mary Moores",
-    type: "Single A",
-    contactDate: "10/28/2024",
-    waittime: "5 months",
-  },
-  {
-    id: 7,
-    waitlistApplicant: "Anne Moores",
-    type: "Single A",
-    contactDate: "10/28/2024",
-    waittime: "6 months",
-  },
-  {
-    id: 8,
-    waitlistApplicant: "Anne Doe",
-    type: "Single B",
-    contactDate: "10/28/2024",
-    waittime: "2 months",
-  },
-  {
-    id: 9,
-    waitlistApplicant: "John Moores",
-    type: "Double C",
-    contactDate: "10/28/2024",
-    waittime: "2 months",
-  },
-];
-
 function Waitlist() {
   const [applicationData, setApplicationData] = useState<ApplicationData[]>([]);
   const navigate = useNavigate();
   const dispatch = useDispatch();
-
+  const [shouldRefetch, setShouldRefetch] = useState(false);
 
   useEffect(() => {
     const fetchWaitlistData = async () => {
@@ -184,7 +118,7 @@ function Waitlist() {
           id: index + 1,
           waitlistApplicant: `${item.firstName} ${item.lastName}`,
           typeId: item.aptTypeId,
-          contactDate: new Date(item.waitlistedDate).toLocaleDateString(),
+          contactDate: new Date(item.waitlistedDate).toLocaleString('en-US', { timeZone: 'UTC' }),
           waittime: findTimeDifferenceFromNow(item.waitlistedDate),
           _id: item._id,
         }));
@@ -197,7 +131,35 @@ function Waitlist() {
     };
 
     fetchWaitlistData();
-  }, []);
+  }, [shouldRefetch]);
+  const handleDeleteWaitlist = async (aptTypeID: string, waitlistIds: any) => {
+    try {
+      const idsArray = Array.isArray(waitlistIds) ? waitlistIds : [waitlistIds];
+      // Construct the URL with the aptTypeId parameter
+      const token = localStorage.getItem("token");
+      const url = `https://globalsolusap.com/waitlist/remove/${aptTypeID}`;
+
+      // Send a DELETE request with the stored token in the headers
+      const response = await fetch(url, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json", // Set Content-Type to indicate JSON
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ waitlistIds: idsArray }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+
+      setShouldRefetch((prev) => !prev);
+      console.log("Waitlist item removed successfully");
+      // Optionally, you can handle the response data here if needed
+    } catch (error) {
+      console.error("Error removing waitlist item:", error);
+    }
+  };
   const handleRowClick = (params: GridRowParams) => {
     // console.log(params)
     const pathName = window.location.pathname;
@@ -217,8 +179,12 @@ function Waitlist() {
     headerName: "Delete",
     width: 200,
     renderCell: (params) => {
+      const handleClick = (event: React.MouseEvent) => {
+        event.stopPropagation(); // Prevent the event from propagating to row selection
+        handleDeleteWaitlist(params?.row?.typeId, params?.row?._id);
+      };
       return (
-        <IconButton aria-label="delete">
+        <IconButton aria-label="delete" onClick={(e) => handleClick(e)}>
           <DeleteIcon sx={{ color: "red" }} />
         </IconButton>
       );
@@ -290,11 +256,11 @@ function Waitlist() {
                 columns={[...columns, actionColumn]}
                 onRowClick={handleRowClick}
                 initialState={{
-                  pagination: {
-                    paginationModel: {
-                      pageSize: 5,
-                    },
-                  },
+                  // pagination: {
+                  //   paginationModel: {
+                  //     pageSize: 5,
+                  //   },
+                  // },
                   columns: {
                     columnVisibilityModel: {
                       // Hidden columns

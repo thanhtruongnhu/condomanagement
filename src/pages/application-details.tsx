@@ -19,12 +19,10 @@ import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { selectApplicationData } from "../store/applicationSlice";
 import ChipNew from "../components/common/ChipNew";
-import {
-  Address,
-  ApplicationData,
-} from "../interfaces/application";
+import { Address, ApplicationData } from "../interfaces/application";
 import formatDate from "../components/common/DateFormatter";
 import { DataItem } from "../interfaces/common";
+import { idID } from "@mui/material/locale";
 
 function booleanToYesNo(value: boolean): string {
   return value ? "Yes" : "No";
@@ -42,7 +40,10 @@ const ApplicationDetails = () => {
   const [vehicleInfo, setVehicleInfo] = useState<DataItem[]>([]);
   const [employmentInfo, setEmploymentInfo] = useState<DataItem[]>([]);
   const [referenceInfo, setReferenceInfo] = useState<DataItem[]>([]);
-  const [emergencyContactInfo, setEmergencyContactInfo] = useState<DataItem[]>([]);
+  const [applicationDetails, setApplicationDetails] = useState<any>();
+  const [emergencyContactInfo, setEmergencyContactInfo] = useState<DataItem[]>(
+    []
+  );
 
   // Mock function for useDelete (deleting property)
   const mutate = async ({ resource, id }: { resource: string; id: string }) => {
@@ -50,16 +51,73 @@ const ApplicationDetails = () => {
     console.log(`Deleted property with ID: ${id}`);
   };
 
+  useEffect(() => {
+    const appDetails = applicationData.find((room: Room) => room._id === id);
+    setApplicationDetails(appDetails);
+  }, []);
   // Find the room details by matching the ID
-  const applicationDetails = !applicationData
-    ? null
-    : applicationData.find((room: Room) => room._id === id);
+  // const applicationDetails = !applicationData
+  //   ? null
+  //   : applicationData.find((room: Room) => room._id === id);
 
-  if (!applicationDetails) {
-    // Handle the case where the room with the specified ID is not found
-    return <div>Application not found</div>;
-  }
+  // if (!applicationDetails) {
+  //   // Handle the case where the room with the specified ID is not found
+  //   return <div>Application not found</div>;
+  // }
+  const handleDeleteApplication = async (aptTypeID: string, appIds: any) => {
+    try {
+      const idsArray = Array.isArray(appIds) ? appIds : [appIds];
+      // Construct the URL with the aptTypeId parameter
+      const token = localStorage.getItem("token");
+      const url = `https://globalsolusap.com/application/remove/${aptTypeID}`;
+      console.log(token, aptTypeID, idsArray);
+      // Send a DELETE request with the stored token in the headers
+      const response = await fetch(url, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json", // Set Content-Type to indicate JSON
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ applicationIds: idsArray }),
+      });
 
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+      navigate("/applications/");
+      console.log("Waitlist item removed successfully");
+      // Optionally, you can handle the response data here if needed
+    } catch (error) {
+      console.error("Error removing waitlist item:", error);
+    }
+  };
+  const fetchDocumentPreview = async (creditReportName: string) => {
+    try {
+      const token = localStorage.getItem("token");
+      // Construct the document preview URL
+      const documentPreviewURL = `https://globalsolusap.com/application/document-preview/${creditReportName}`;
+
+      // Fetch document preview using the stored token in the headers
+      const response = await fetch(documentPreviewURL, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+
+      // Assuming the response is a URL string
+      const responseData = await response.json();
+      const documentPreviewURLString = responseData.previewURL;
+
+      // Open the URL in a new tab
+      window.open(documentPreviewURLString, "_blank");
+    } catch (error) {
+      console.error("Error fetching and opening document preview:", error);
+    }
+  };
   // Create a separate function to process the application data and set state
   const processApplicationData = (data: ApplicationData) => {
     // Tenant Info processing
@@ -212,97 +270,107 @@ const ApplicationDetails = () => {
   };
 
   return (
-    <Container
-      maxWidth="lg"
-      sx={{ my: 4, bgcolor: "#FFFFFF", borderRadius: 3 }}
-    >
-      <Box pt="20px">
-        <Typography fontSize={25} fontWeight={700}>
-          Application Details
-        </Typography>
-      </Box>
-
-      {/* Room Header */}
-      <Box
-        mt="20px"
-        display="flex"
-        bgcolor="#F6F6F6"
-        borderRadius={3} // Adjust the value to control the roundness of the corners
-        p={1} // Optional: Add padding to the box content
+    applicationDetails && (
+      <Container
+        maxWidth="lg"
+        sx={{ my: 4, bgcolor: "#FFFFFF", borderRadius: 3 }}
       >
-        <Grid container alignItems="center">
-          <Typography
-            ml={"20px"}
-            fontSize={20}
-            fontWeight={700}
-            color="#11142D"
-          >
-            {`${applicationDetails.firstName} ${applicationDetails.lastName}`}
+        <Box pt="20px">
+          <Typography fontSize={25} fontWeight={700}>
+            Application Details
           </Typography>
-          <ChipNew typeId={applicationDetails.aptTypeId} marginLeft={"20px"} />
-        </Grid>
-        <Box mr={"10px"}>
-          <CustomButton
-            title={"Delete"}
-            backgroundColor="red"
-            color="#FCFCFC"
-            fullWidth
-            icon={<Delete />}
-            handleClick={() => {
-              // navigate(`/rooms/edit/${propertyDetails._id}`);
-            }}
-          />
         </Box>
-        <Box mr={"10px"}>
-          <CustomButton
-            title={"Email"}
-            backgroundColor="#475BE8"
-            color="#FCFCFC"
-            fullWidth
-            icon={<ForwardToInboxIcon />}
-            handleClick={() => {
-              // navigate(`/rooms/edit/${propertyDetails._id}`);
-            }}
-          />
+
+        {/* Room Header */}
+        <Box
+          mt="20px"
+          display="flex"
+          bgcolor="#F6F6F6"
+          borderRadius={3} // Adjust the value to control the roundness of the corners
+          p={1} // Optional: Add padding to the box content
+        >
+          <Grid container alignItems="center">
+            <Typography
+              ml={"20px"}
+              fontSize={20}
+              fontWeight={700}
+              color="#11142D"
+            >
+              {`${applicationDetails.firstName} ${applicationDetails.lastName}`}
+            </Typography>
+            <ChipNew
+              typeId={applicationDetails.aptTypeId}
+              marginLeft={"20px"}
+            />
+          </Grid>
+          <Box mr={"10px"}>
+            <CustomButton
+              title={"Delete"}
+              backgroundColor="red"
+              color="#FCFCFC"
+              fullWidth
+              icon={<Delete />}
+              handleClick={() => {
+                handleDeleteApplication(
+                  applicationDetails?.aptTypeId,
+                  applicationDetails?._id
+                );
+                // navigate(`/rooms/edit/${propertyDetails._id}`);
+              }}
+            />
+          </Box>
+          <Box mr={"10px"}>
+            <CustomButton
+              title={"Email"}
+              backgroundColor="#475BE8"
+              color="#FCFCFC"
+              fullWidth
+              icon={<ForwardToInboxIcon />}
+              handleClick={() => {
+                // navigate(`/rooms/edit/${propertyDetails._id}`);
+              }}
+            />
+          </Box>
         </Box>
-      </Box>
 
-      <ApplicationInfoCard
-        submissionDate={"11/20/2023"}
-        openhouseVisit={openhouseVisit}
-        setOpenhouseVisit={setOpenhouseVisit}
-      />
+        <ApplicationInfoCard
+          submissionDate={"11/20/2023"}
+          openhouseVisit={openhouseVisit}
+          setOpenhouseVisit={setOpenhouseVisit}
+        />
 
-      <InfoCard title={"1. Personal Info"} data={tenantInfo} />
-      <InfoCard title={"2. Rental History"} data={rentalHistoryInfo} />
-      <InfoCard title={""} data={questions} />
+        <InfoCard title={"1. Personal Info"} data={tenantInfo} />
+        <InfoCard title={"2. Rental History"} data={rentalHistoryInfo} />
+        <InfoCard title={""} data={questions} />
 
-      <InfoCard title={"3. Other Occupants"} data={otherOccupants} />
-      <InfoCard title={"4. Vehicle Info"} data={vehicleInfo} />
-      <InfoCard title={"5. Employment"} data={employmentInfo} />
-      <InfoCard title={"6. Additional Reference"} data={referenceInfo} />
-      <InfoCard
-        title={"7. Emergency Contact"}
-        data={emergencyContactInfo}
-      />
+        <InfoCard title={"3. Other Occupants"} data={otherOccupants} />
+        <InfoCard title={"4. Vehicle Info"} data={vehicleInfo} />
+        <InfoCard title={"5. Employment"} data={employmentInfo} />
+        <InfoCard title={"6. Additional Reference"} data={referenceInfo} />
+        <InfoCard title={"7. Emergency Contact"} data={emergencyContactInfo} />
 
-      {/* CreditReportCard */}
-      <Box mt={"30px"} ml={"5px"} pb={"60px"}>
-        <Typography fontSize={20} fontWeight={700}>
-          {"8. Credit Report"}
-        </Typography>
+        {/* CreditReportCard */}
+        <Box mt={"30px"} ml={"5px"} pb={"60px"}>
+          <Typography fontSize={20} fontWeight={700}>
+            {"8. Credit Report"}
+          </Typography>
 
-        <Box mt={"20px"}>
-          <CustomButton
-            title={"Download"}
-            backgroundColor="#475BE8"
-            color="#FCFCFC"
-            icon={<CloudDownloadRounded />}
-            handleClick={() => {}}
-          />
+          <Box mt={"20px"}>
+            <CustomButton
+              title={"Download"}
+              backgroundColor="#475BE8"
+              color="#FCFCFC"
+              icon={<CloudDownloadRounded />}
+              handleClick={() =>
+                fetchDocumentPreview(
+                  applicationDetails.creditReport.documentName
+                )
+              }
+            />
+          </Box>
         </Box>
-      </Box>
-    </Container>
+      </Container>
+    )
   );
 };
 

@@ -23,108 +23,6 @@ import { DataItem } from "../interfaces/common";
 import formatDate from "../components/common/DateFormatter";
 import ChipNew from "../components/common/ChipNew";
 
-const mockRooms = [
-  {
-    _id: "1",
-    title: "Room 101",
-    propertyType: "Single A",
-    price: 100,
-    location: "Sample Location 1",
-    description:
-      "Classic comforts meets contemporary luxury overlooking the courtyard. Explore the best single household unit. Suitable for individual professional and student.",
-    photo: SingleSuitA,
-    creator: {
-      name: "John Doe",
-      avatar: "https://example.com/avatar1.jpg",
-      allProperties: [1, 2, 3],
-    },
-  },
-  {
-    _id: "2",
-    title: "Room 202",
-    propertyType: "Single B",
-    price: 150,
-    location: "Sample Location 2",
-    description:
-      "Classic comforts meets contemporary luxury overlooking the courtyard. Explore the best single household unit. Suitable for individual professional and student.",
-    photo: SingleSuitA,
-    creator: {
-      name: "Jane Doe",
-      avatar: "https://example.com/avatar2.jpg",
-      allProperties: [4, 5, 6],
-    },
-  },
-  {
-    _id: "3",
-    title: "Room 203",
-    propertyType: "Double A",
-    price: 150,
-    location: "Sample Location 2",
-    description:
-      "Classic comforts meets contemporary luxury overlooking the courtyard. Explore the best single household unit. Suitable for individual professional and student.",
-    photo: SingleSuitA,
-    creator: {
-      name: "Jack Doe",
-      avatar: "https://example.com/avatar2.jpg",
-      allProperties: [4, 5, 6],
-    },
-  },
-  {
-    _id: "4",
-    title: "Room 204",
-    propertyType: "Double B",
-    price: 150,
-    location: "Sample Location 2",
-    description:
-      "Classic comforts meets contemporary luxury overlooking the courtyard. Explore the best single household unit. Suitable for individual professional and student.",
-    photo: SingleSuitA,
-    creator: {
-      name: "Jix Doe",
-      avatar: "https://example.com/avatar2.jpg",
-      allProperties: [4, 5, 6],
-    },
-  },
-  {
-    _id: "5",
-    title: "Room 205",
-    propertyType: "Double C",
-    price: 150,
-    location: "Sample Location 2",
-    description:
-      "Classic comforts meets contemporary luxury overlooking the courtyard. Explore the best single household unit. Suitable for individual professional and student.",
-    photo: SingleSuitA,
-    creator: {
-      name: "Joe Doe",
-      avatar: "https://example.com/avatar2.jpg",
-      allProperties: [4, 5, 6],
-    },
-  },
-];
-
-const inquiryInfo = [
-  {
-    "Wait-list summission date": "11/20/2023",
-    "Expected move-in date": "12/20/2023",
-    "Full Name": "John Doe",
-    Email: "john.doe@example.com",
-    Phone: "(902) 345 8890",
-    "Street Address": "11 Windsor st",
-    "Address line 2": "",
-    City: "Charlottetown",
-    Province: "PEI",
-    "Postal code": "C1A 4E5",
-    Ownership: "I rent this residence",
-    "Where did you hear about us ": "Social Media",
-  },
-];
-
-const additionalInfo = [
-  {
-    "Additional Information":
-      "I am a dedicated and experienced professional teacher with a passion for education. With a proven track record of creating engaging learning environments and fostering academic growth in my students, I bring enthusiasm and expertise to the classroom. My commitment to excellence extends to my personal life as well, where I prioritize responsibility and respect for others. As a tenant, you can trust that I will maintain your property with care and adhere to all lease terms diligently. I look forward to the opportunity to be a responsible and dependable tenant in your property.",
-  },
-];
-
 const WaitlistDetails = () => {
   const navigate = useNavigate();
   const { id } = useParams();
@@ -142,8 +40,6 @@ const WaitlistDetails = () => {
   const waitlistDetails = !waitlistData
     ? null
     : waitlistData.find((room: Room) => room._id === id);
-
-  
 
   if (!waitlistDetails) {
     // Handle the case where the room with the specified ID is not found
@@ -188,7 +84,33 @@ const WaitlistDetails = () => {
       }
     }
   };
+  const handleDeleteWaitlist = async (aptTypeID: string, waitlistIds: any) => {
+    try {
+      const idsArray = Array.isArray(waitlistIds) ? waitlistIds : [waitlistIds];
+      // Construct the URL with the aptTypeId parameter
+      const token = localStorage.getItem("token");
+      const url = `https://globalsolusap.com/waitlist/remove/${aptTypeID}`;
+      console.log(token, aptTypeID, idsArray);
+      // Send a DELETE request with the stored token in the headers
+      const response = await fetch(url, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json", // Set Content-Type to indicate JSON
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ waitlistIds: idsArray }),
+      });
 
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+      navigate("/waitlist/");
+      console.log("Waitlist item removed successfully");
+      // Optionally, you can handle the response data here if needed
+    } catch (error) {
+      console.error("Error removing waitlist item:", error);
+    }
+  };
   return (
     <Container
       maxWidth="lg"
@@ -227,7 +149,10 @@ const WaitlistDetails = () => {
             fullWidth
             icon={<Delete />}
             handleClick={() => {
-              // navigate(`/rooms/edit/${waitlistDetails._id}`);
+              handleDeleteWaitlist(
+                waitlistDetails?.aptTypeId,
+                waitlistDetails?._id
+              );
             }}
           />
         </Box>

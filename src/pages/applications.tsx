@@ -53,85 +53,11 @@ const columns: GridColDef[] = [
   },
 ];
 
-const applicationData = [
-  {
-    id: 1,
-    applicantName: "John Doe",
-    type: "Single A",
-    submissionDate: "10/28/2024",
-    moveinDate: "12/01/2024",
-    openhouseVisit: true,
-  },
-  {
-    id: 2,
-    applicantName: "Jane Doe",
-    type: "Single B",
-    submissionDate: "10/28/2024",
-    moveinDate: "12/01/2024",
-    openhouseVisit: true,
-  },
-  {
-    id: 3,
-    applicantName: "Jake Doe",
-    type: "Double A",
-    submissionDate: "10/28/2024",
-    moveinDate: "12/01/2024",
-    openhouseVisit: false,
-  },
-  {
-    id: 4,
-    applicantName: "Jix Doe",
-    type: "Double B",
-    submissionDate: "10/28/2024",
-    moveinDate: "12/01/2024",
-    openhouseVisit: false,
-  },
-  {
-    id: 5,
-    applicantName: "Joe Doe",
-    type: "Double C",
-    submissionDate: "10/28/2024",
-    moveinDate: "12/01/2024",
-    openhouseVisit: true,
-  },
-  {
-    id: 6,
-    applicantName: "Mary Moores",
-    type: "Single A",
-    submissionDate: "10/28/2024",
-    moveinDate: "12/01/2024",
-    openhouseVisit: false,
-  },
-  {
-    id: 7,
-    applicantName: "Anne Moores",
-    type: "Single A",
-    submissionDate: "10/28/2024",
-    moveinDate: "12/01/2024",
-    openhouseVisit: true,
-  },
-  {
-    id: 8,
-    applicantName: "Anne Doe",
-    type: "Single B",
-    submissionDate: "10/28/2024",
-    moveinDate: "12/01/2024",
-    openhouseVisit: false,
-  },
-  {
-    id: 9,
-    applicantName: "John Moores",
-    type: "Double C",
-    submissionDate: "10/28/2024",
-    moveinDate: "12/01/2024",
-    openhouseVisit: true,
-  },
-];
-
 function Applications() {
   const [applicationData, setApplicationData] = useState<ApplicationData[]>([]);
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const [shouldRefetch, setShouldRefetch] = useState(false);
 
   // 1. Fetch all applications
   useEffect(() => {
@@ -161,14 +87,18 @@ function Applications() {
 
         const data = await response.json();
         dispatch(updateApplicationData(data));
-
         // Map the data from the endpoint to the 'applicationData' array format
         const mappedData = data.map((item: ApplicationData, index: number) => ({
           id: index + 1,
           applicantName: `${item.firstName} ${item.lastName}`,
           typeId: item.aptTypeId,
-          submissionDate: new Date(item.applicationDate).toLocaleDateString(),
-          moveinDate: new Date(item.moveInDate).toLocaleDateString(),
+          submissionDate: new Date(item.applicationDate).toLocaleString(
+            "en-US",
+            { timeZone: "UTC" }
+          ),
+          moveinDate: new Date(item.moveInDate).toLocaleDateString("en-US", {
+            timeZone: "UTC",
+          }),
           openhouseVisit: item.shownApt,
           _id: item._id,
         }));
@@ -181,7 +111,34 @@ function Applications() {
     };
 
     fetchApplicationData();
-  }, []);
+  }, [shouldRefetch]);
+  const handleDeleteApplication = async (aptTypeID: string, appIds: any) => {
+    try {
+      const idsArray = Array.isArray(appIds) ? appIds : [appIds];
+      // Construct the URL with the aptTypeId parameter
+      const token = localStorage.getItem("token");
+      const url = `https://globalsolusap.com/application/remove/${aptTypeID}`;
+      console.log(token, aptTypeID, idsArray);
+      // Send a DELETE request with the stored token in the headers
+      const response = await fetch(url, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json", // Set Content-Type to indicate JSON
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ applicationIds: idsArray }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+      setShouldRefetch((prev) => !prev);
+      console.log("Waitlist item removed successfully");
+      // Optionally, you can handle the response data here if needed
+    } catch (error) {
+      console.error("Error removing waitlist item:", error);
+    }
+  };
 
   const handleRowClick = (params: GridRowParams) => {
     const pathName = window.location.pathname;
@@ -201,8 +158,12 @@ function Applications() {
     headerName: "Delete",
     width: 200,
     renderCell: (params) => {
+      const handleClick = (event: React.MouseEvent) => {
+        event.stopPropagation(); // Prevent the event from propagating to row selection
+        handleDeleteApplication(params?.row?.typeId, params?.row?._id);
+      };
       return (
-        <IconButton aria-label="delete">
+        <IconButton aria-label="delete" onClick={(e) => handleClick(e)}>
           <DeleteIcon sx={{ color: "red" }} />
         </IconButton>
       );
@@ -272,13 +233,6 @@ function Applications() {
             rows={applicationData}
             columns={[...columns, actionColumn]}
             onRowClick={handleRowClick}
-            initialState={{
-              pagination: {
-                paginationModel: {
-                  pageSize: 5,
-                },
-              },
-            }}
             pageSizeOptions={[5]}
             checkboxSelection
             disableRowSelectionOnClick

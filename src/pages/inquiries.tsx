@@ -52,6 +52,35 @@ function Inquiries() {
   const [inquiryData, setInquiryData] = useState<InquiryData[]>([]);
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const [shouldRefetch, setShouldRefetch] = useState(false);
+  const handleDeleteInquiries = async (aptTypeID: string, inquiryIds: any) => {
+    try {
+      const idsArray = Array.isArray(inquiryIds) ? inquiryIds : [inquiryIds];
+      // Construct the URL with the aptTypeId parameter
+      const token = localStorage.getItem("token");
+      const url = `https://globalsolusap.com/inquiry/remove/${aptTypeID}`;
+
+      // Send a DELETE request with the stored token in the headers
+      const response = await fetch(url, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json", // Set Content-Type to indicate JSON
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ inquiryIds: idsArray }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+
+      setShouldRefetch((prev) => !prev);
+      console.log("Inquiry item removed successfully");
+      // Optionally, you can handle the response data here if needed
+    } catch (error) {
+      console.error("Error removing waitlist item:", error);
+    }
+  };
 
   useEffect(() => {
     const fetchInquiryData = async () => {
@@ -86,7 +115,7 @@ function Inquiries() {
           id: index + 1,
           inquirer: `${item.firstName} ${item.lastName}`,
           typeId: item.aptTypeId,
-          inquiryDate: new Date(item.inquiryDate).toLocaleDateString(),
+          inquiryDate: new Date(item.inquiryDate).toLocaleString('en-US', { timeZone: 'UTC' }),
           _id: item._id,
         }));
 
@@ -98,7 +127,7 @@ function Inquiries() {
     };
 
     fetchInquiryData();
-  }, []);
+  }, [shouldRefetch]);
 
   const handleRowClick = (params: GridRowParams) => {
     // console.log(params)
@@ -119,8 +148,12 @@ function Inquiries() {
     headerName: "Delete",
     width: 200,
     renderCell: (params) => {
+      const handleClick = (event: React.MouseEvent) => {
+        event.stopPropagation(); // Prevent the event from propagating to row selection
+        handleDeleteInquiries(params?.row?.typeId, params?.row?._id);
+      };
       return (
-        <IconButton aria-label="delete">
+        <IconButton aria-label="delete" onClick={(e) => handleClick(e)}>
           <DeleteIcon sx={{ color: "red" }} />
         </IconButton>
       );
@@ -193,11 +226,11 @@ function Inquiries() {
                 columns={[...columns, actionColumn]}
                 onRowClick={handleRowClick}
                 initialState={{
-                  pagination: {
-                    paginationModel: {
-                      pageSize: 5,
-                    },
-                  },
+                  // pagination: {
+                  //   paginationModel: {
+                  //     pageSize: 5,
+                  //   },
+                  // },
                   columns: {
                     columnVisibilityModel: {
                       // Hidden columns

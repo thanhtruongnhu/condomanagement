@@ -334,11 +334,11 @@ function Inventory() {
                 rows={apartmentData}
                 columns={[...columns, actionColumn]}
                 initialState={{
-                  pagination: {
-                    paginationModel: {
-                      pageSize: 5,
-                    },
-                  },
+                  // pagination: {
+                  //   paginationModel: {
+                  //     pageSize: 5,
+                  //   },
+                  // },
                   columns: {
                     columnVisibilityModel: {
                       // Hide column availableDate, the other columns will remain visible

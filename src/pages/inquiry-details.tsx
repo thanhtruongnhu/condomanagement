@@ -69,19 +69,31 @@ const InquiryDetails = () => {
     }
   }, [inquiryDetails]);
 
-  const handleDeleteProperty = () => {
-    if (id) {
-      const response = window.confirm(
-        "Are you sure you want to delete this property?"
-      );
-      if (response) {
-        mutate({
-          resource: "properties",
-          id: id,
-        }).then(() => {
-          navigate("/rooms");
-        });
+  const handleDeleteInquiries = async (aptTypeID: string, inquiryIds: any) => {
+    try {
+      const idsArray = Array.isArray(inquiryIds) ? inquiryIds : [inquiryIds];
+      // Construct the URL with the aptTypeId parameter
+      const token = localStorage.getItem("token");
+      const url = `https://globalsolusap.com/inquiry/remove/${aptTypeID}`;
+
+      // Send a DELETE request with the stored token in the headers
+      const response = await fetch(url, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json", // Set Content-Type to indicate JSON
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ inquiryIds: idsArray }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
       }
+      navigate('/inquires');
+      console.log("Inquiry item removed successfully");
+      // Optionally, you can handle the response data here if needed
+    } catch (error) {
+      console.error("Error removing waitlist item:", error);
     }
   };
 
@@ -123,6 +135,10 @@ const InquiryDetails = () => {
             fullWidth
             icon={<Delete />}
             handleClick={() => {
+              handleDeleteInquiries(
+                inquiryDetails?.aptTypeId,
+                inquiryDetails?._id
+              );
               // navigate(`/rooms/edit/${inquiryDetails._id}`);
             }}
           />
