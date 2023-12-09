@@ -155,7 +155,7 @@ const FormEditRoom = ({ type, propertyDetails }: FormProps) => {
         throw new Error(`HTTP error! Status: ${response.status}`);
       }
     } catch (error) {
-      console.error("Error fetching apartment type data:", error);
+      console.error("Error updating apartment type data:", error);
     }
   };
 

@@ -97,7 +97,7 @@ const RoomDetails = () => {
       };
     });
 
-    console.log('mockOtherOccupants::',mockOtherOccupants)
+    // console.log('mockOtherOccupants::',mockOtherOccupants)
 
     const mockVehicleInfo = carModels.map((carModel) => ({
       Make: carModel.make,
