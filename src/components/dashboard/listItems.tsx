@@ -20,7 +20,7 @@ export const mainListItems = (
         <ListItemText primary="Dashboard" />
       </ListItemButton>
     </Link> */}
-    <Link to="/rooms" style={{ textDecoration: "none", color: "inherit" }}>
+    <Link to="/rooms/" style={{ textDecoration: "none", color: "inherit" }}>
       <ListItemButton>
         <ListItemIcon>
           <MeetingRoomIcon />
@@ -28,7 +28,7 @@ export const mainListItems = (
         <ListItemText primary="Rooms" />
       </ListItemButton>
     </Link>
-    <Link to="/inventory" style={{ textDecoration: "none", color: "inherit" }}>
+    <Link to="/inventory/" style={{ textDecoration: "none", color: "inherit" }}>
       <ListItemButton>
         <ListItemIcon>
           <DvrIcon />

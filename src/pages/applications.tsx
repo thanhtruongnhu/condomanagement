@@ -4,6 +4,7 @@ import {
   IconButton,
   MenuItem,
   Select,
+  Skeleton,
   Switch,
   Typography,
 } from "@mui/material";
@@ -11,6 +12,7 @@ import {
   DataGrid,
   GridColDef,
   GridRowParams,
+  GridSortModel,
   GridValueGetterParams,
 } from "@mui/x-data-grid";
 import { Filter, CurrentFilterValues } from "../interfaces/property";
@@ -24,11 +26,11 @@ import { ApplicationData } from "../interfaces/application";
 import ChipNew from "../components/common/ChipNew";
 
 const columns: GridColDef[] = [
-  { field: "applicantName", headerName: "Applicant name", width: 150 },
+  { field: "applicantName", headerName: "Applicant name", width: 250 },
   {
     field: "type",
     headerName: "Type",
-    width: 150,
+    width: 250,
     renderCell: (params) => {
       return <ChipNew typeId={params.row.typeId} marginLeft={"0"} />;
     },
@@ -36,7 +38,7 @@ const columns: GridColDef[] = [
   {
     field: "submissionDate",
     headerName: "Submission Date",
-    width: 150,
+    width: 250,
     editable: false,
   },
   {
@@ -48,7 +50,7 @@ const columns: GridColDef[] = [
   {
     field: "openhouseVisit",
     headerName: "Openhouse visit",
-    width: 150,
+    width: 250,
     type: "boolean",
   },
 ];
@@ -58,6 +60,13 @@ function Applications() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [shouldRefetch, setShouldRefetch] = useState(false);
+
+  const [sortModel, setSortModel] = useState<GridSortModel>([
+    {
+      field: 'submissionDate', // Specify the field to sort by
+      sort: 'asc', // Specify the sort direction ('asc' or 'desc')
+    },
+  ]);
 
   // 1. Fetch all applications
   useEffect(() => {
@@ -195,48 +204,58 @@ function Applications() {
           <Typography fontSize={25} fontWeight={700} color="#11142d">
             All Applications
           </Typography>
+          {!applicationData.length ? (
+            <Box sx={{ width: 300 }}>
+              <Skeleton />
+              <Skeleton animation="wave" />
+              <Skeleton animation={false} />
+            </Box>
+          ) : (
+            <>
+              {/* FILTER */}
+              <Select
+                // fullWidth
+                sx={{ width: "200px" }}
+                variant="outlined"
+                color="info"
+                displayEmpty
+                required
+                inputProps={{ "aria-label": "Without label" }}
+                defaultValue=""
+                value={currentFilterValues.propertyType || ""}
+                onChange={(e) => {
+                  const newFilter = {
+                    propertyType: e.target.value,
+                  };
+                  setFilters(newFilter);
+                }}
+              >
+                <MenuItem value="">All</MenuItem>
+                {[
+                  "Single Suite A",
+                  "Single Suite B ♿",
+                  "Double Suite A",
+                  "Double Suite B",
+                  "Double Suite C",
+                ].map((type) => (
+                  <MenuItem key={type} value={type.toLowerCase()}>
+                    {type}
+                  </MenuItem>
+                ))}
+              </Select>
 
-          {/* FILTER */}
-          <Select
-            // fullWidth
-            sx={{ width: "200px" }}
-            variant="outlined"
-            color="info"
-            displayEmpty
-            required
-            inputProps={{ "aria-label": "Without label" }}
-            defaultValue=""
-            value={currentFilterValues.propertyType || ""}
-            onChange={(e) => {
-              const newFilter = {
-                propertyType: e.target.value,
-              };
-              setFilters(newFilter);
-            }}
-          >
-            <MenuItem value="">All</MenuItem>
-            {[
-              "Single Suite A",
-              "Single Suite B ♿",
-              "Double Suite A",
-              "Double Suite B",
-              "Double Suite C",
-            ].map((type) => (
-              <MenuItem key={type} value={type.toLowerCase()}>
-                {type}
-              </MenuItem>
-            ))}
-          </Select>
-
-          {/* DATA TABLE */}
-          <DataGrid
-            rows={applicationData}
-            columns={[...columns, actionColumn]}
-            onRowClick={handleRowClick}
-            pageSizeOptions={[5]}
-            checkboxSelection
-            disableRowSelectionOnClick
-          />
+              {/* DATA TABLE */}
+              <DataGrid
+                rows={applicationData}
+                columns={[...columns, actionColumn]}
+                onRowClick={handleRowClick}
+                pageSizeOptions={[1000000]}
+                checkboxSelection
+                disableRowSelectionOnClick
+                sortModel={sortModel}
+              />
+            </>
+          )}
         </form>
       </Box>
     </Box>

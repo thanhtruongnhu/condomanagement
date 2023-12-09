@@ -1,191 +1,206 @@
 import React, { useEffect, useState } from "react";
-import Add from "@mui/icons-material/Add";
 import Box from "@mui/material/Box";
-import Stack from "@mui/material/Stack";
-import Typography from "@mui/material/Typography";
-import TextField from "@mui/material/TextField";
-import Select from "@mui/material/Select";
-import MenuItem from "@mui/material/MenuItem";
-import { useNavigate } from "react-router-dom";
-import { useMemo } from "react";
-import CustomButton from "../components/common/CustomButton";
-import PropertyCard from "../components/common/PropertyCard";
+import {
+  IconButton,
+  MenuItem,
+  Select,
+  Switch,
+  Typography,
+} from "@mui/material";
+import {
+  DataGrid,
+  GridColDef,
+  GridRowParams,
+  GridValueGetterParams,
+} from "@mui/x-data-grid";
 import {
   Filter,
   CurrentFilterValues,
   ApartmentData,
 } from "../interfaces/property";
-import { Property } from "../interfaces/property";
+import DeleteIcon from "@mui/icons-material/Delete";
+import { useNavigate } from "react-router-dom";
+import { Type } from "../interfaces/common";
+import Chip from "../components/common/Chip";
+import { useDispatch } from "react-redux";
+import { updateApplicationData } from "../store/applicationSlice";
+import { ApplicationData } from "../interfaces/application";
+import ChipNew from "../components/common/ChipNew";
+import { updateRoomData } from "../store/roomSlice";
+
+const columns: GridColDef[] = [
+  { field: "roomNumber", headerName: "Room number", width: 150 },
+  {
+    field: "type",
+    headerName: "Type",
+    width: 250,
+    renderCell: (params) => {
+      return <ChipNew typeId={params.row.type} marginLeft={"0"} />;
+    },
+  },
+  {
+    field: "mainTenantName",
+    headerName: "Main tenant name",
+    width: 250,
+    editable: false,
+  },
+  {
+    field: "startDate",
+    headerName: "Start-of-contract Date",
+    width: 250,
+    editable: false,
+  },
+  {
+    field: "endDate",
+    headerName: "Start-of-contract Date",
+    width: 250,
+    editable: false,
+  },
+];
 
 function Rooms() {
-  const [current, setCurrent] = useState(1);
-  const [pageSize, setPageSize] = useState(10); // Default page size
-  const [currentFilterValues, setCurrentFilterValues] =
-    useState<CurrentFilterValues>({});
-  const [allProperties, setAllProperties] = useState<ApartmentData[]>([]);
+  const [roomData, setRoomData] = useState<ApplicationData[]>([]);
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
 
-  const pageCount = Math.ceil(allProperties.length / pageSize);
+  // 1. Fetch all applications
+  useEffect(() => {
+    const fetchRoomData = async () => {
+      try {
+        // Retrieve the token from localStorage
+        const token = localStorage.getItem("token");
+
+        // Check if the token is available
+        if (!token) {
+          console.error("Token not available. Please authenticate first.");
+          return;
+        }
+
+        // Fetch application data using your domain, including the token in the headers
+        const response = await fetch("https://globalsolusap.com/apartment/", {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        dispatch(updateRoomData(data));
+        // Map the data from the endpoint to the 'roomData' array format
+        const mappedData = data.map((item: ApartmentData, index: number) => ({
+          id: index + 1,
+          roomNumber: item.apartmentNumber,
+          type: item.apartmentType._id,
+          mainTenantName: `${item.tenants[0].firstName} ${item.tenants[0].lastName}`,
+          startDate: new Date(item.contractStartDate).toLocaleDateString(
+            "en-US",
+            {
+              timeZone: "UTC",
+            }
+          ),
+          endDate: new Date(item.contractEndDate).toLocaleDateString("en-US", {
+            timeZone: "UTC",
+          }),
+          _id: item._id,
+        }));
+
+        // Set the mapped data to 'roomData'
+        setRoomData(mappedData);
+      } catch (error) {
+        console.error("Error fetching room data:", error);
+      }
+    };
+
+    fetchRoomData();
+  }, []);
+
+  const handleRowClick = (params: GridRowParams) => {
+    const pathName = window.location.pathname;
+    // Redirect the user to a different page with the row ID as a parameter
+    navigate(`${pathName}show/${params.row._id}`);
+  };
+
   const setFilters = (newFilter: Filter) => {
     setCurrentFilterValues(newFilter);
   };
 
-  function formatDate(dateString: string): string {
-    const date = new Date(dateString);
-    const options: Intl.DateTimeFormatOptions = {
-      month: "2-digit",
-      day: "2-digit",
-      year: "numeric", // Use "numeric" instead of a string
-    };
-    return date.toLocaleDateString(undefined, options) || "";
-  }
-
-  const fetchProperties = async () => {
-    try {
-      // Retrieve the token from localStorage
-      const token = localStorage.getItem("token");
-
-      // Check if the token is available
-      if (!token) {
-        console.error("Token not available. Please authenticate first.");
-        return;
-      }
-
-      // Fetch properties using your domain and including the token in the headers
-      const response = await fetch("https://globalsolusap.com/apartment/", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! Status: ${response.status}`);
-      }
-
-      const apiResponse = await response.json();
-      setAllProperties(apiResponse);
-    } catch (error) {
-      console.error("Error:", error);
-    }
-  };
-
-  useEffect(() => {
-    fetchProperties();
-  }, []);
+  const [currentFilterValues, setCurrentFilterValues] =
+    useState<CurrentFilterValues>({});
 
   return (
-    <Box ml="40px">
-      <Box mt="20px" sx={{ display: "flex", flexWrap: "wrap", gap: 3 }}>
-        <Stack direction="column" width="100%">
+    <Box mx={"20px"} mb={"40px"}>
+      <Box
+        mt={2.5}
+        borderRadius="15px"
+        pt={"0.5px"}
+        pb={"30px"}
+        px={"40px"}
+        bgcolor="#fcfcfc"
+      >
+        <form
+          style={{
+            marginTop: "20px",
+            // width: "100%",
+            // width:"200px",
+            display: "flex",
+            flexDirection: "column",
+            gap: "20px",
+          }}
+          // onSubmit={handleSubmit(onFinishHandler)}
+        >
+          {/* HEADER */}
           <Typography fontSize={25} fontWeight={700} color="#11142d">
-            {!allProperties.length ? "There are no properties" : "All Rooms"}
+            All Rooms
           </Typography>
-          <Box
-            mb={2}
-            mt={3}
-            display="flex"
-            width="84%"
-            justifyContent="space-between"
-            flexWrap="wrap"
-          >
-            <Box
-              display="flex"
-              gap={2}
-              flexWrap="wrap"
-              mb={{ xs: "20px", sm: 0 }}
-            >
-              <Select
-                sx={{ width: "200px" }}
-                variant="outlined"
-                color="info"
-                displayEmpty
-                required
-                inputProps={{ "aria-label": "Without label" }}
-                defaultValue=""
-                value={currentFilterValues.propertyType || ""}
-                onChange={(e) => {
-                  const newFilter = {
-                    propertyType: e.target.value,
-                  };
-                  setFilters(newFilter);
-                }}
-              >
-                <MenuItem value="">All</MenuItem>
-                {[
-                  "Single Suite A",
-                  "Single Suite B ♿",
-                  "Double Suite A",
-                  "Double Suite B",
-                  "Double Suite C",
-                ].map((type) => (
-                  <MenuItem key={type} value={type.toLowerCase()}>
-                    {type}
-                  </MenuItem>
-                ))}
-              </Select>
-            </Box>
-          </Box>
-        </Stack>
-      </Box>
 
-      <Box mt="20px" sx={{ display: "flex", flexWrap: "wrap", gap: 3 }}>
-        {allProperties?.map((property, index) => (
-          <PropertyCard
-            key={index} // Change the key to use the index
-            id={property._id}
-            title={property.apartmentNumber}
-            tenant={`${property.tenants[0].firstName} ${property.tenants[0].lastName}`}
-            type={property.apartmentType.aptCode}
-            photo="https://i0.wp.com/blog.bestinamericanliving.com/wp-content/uploads/2017/01/P9617_Cat21_FirstImpressionExterior_20160831100108_38409.jpg"
-            expiry={formatDate(property.contractEndDate)}
-          />
-        ))}
-      </Box>
-
-      {allProperties.length > 0 && (
-        <Box display="flex" gap={2} mt={3} flexWrap="wrap">
-          <CustomButton
-            title="Previous"
-            handleClick={() => setCurrent((prev) => prev - 1)}
-            backgroundColor="#475be8"
-            color="#fcfcfc"
-            disabled={!(current > 1)}
-          />
-          <Box
-            display={{ xs: "hidden", sm: "flex" }}
-            alignItems="center"
-            gap="5px"
-          >
-            Page{" "}
-            <strong>
-              {current} of {pageCount}
-            </strong>
-          </Box>
-          <CustomButton
-            title="Next"
-            handleClick={() => setCurrent((prev) => prev + 1)}
-            backgroundColor="#475be8"
-            color="#fcfcfc"
-            disabled={current === pageCount}
-          />
+          {/* FILTER */}
           <Select
+            // fullWidth
+            sx={{ width: "200px" }}
             variant="outlined"
             color="info"
             displayEmpty
             required
             inputProps={{ "aria-label": "Without label" }}
-            defaultValue={10}
-            onChange={(e) =>
-              setPageSize(e.target.value ? Number(e.target.value) : 10)
-            }
+            defaultValue=""
+            value={currentFilterValues.propertyType || ""}
+            onChange={(e) => {
+              const newFilter = {
+                propertyType: e.target.value,
+              };
+              setFilters(newFilter);
+            }}
           >
-            {[10, 20, 30, 40, 50].map((size) => (
-              <MenuItem key={size} value={size}>
-                Show {size}
+            <MenuItem value="">All</MenuItem>
+            {[
+              "Single Suite A",
+              "Single Suite B ♿",
+              "Double Suite A",
+              "Double Suite B",
+              "Double Suite C",
+            ].map((type) => (
+              <MenuItem key={type} value={type.toLowerCase()}>
+                {type}
               </MenuItem>
             ))}
           </Select>
-        </Box>
-      )}
+
+          {/* DATA TABLE */}
+          <DataGrid
+            rows={roomData}
+            columns={[...columns]}
+            onRowClick={handleRowClick}
+            pageSizeOptions={[100]}
+            // checkboxSelection
+            disableRowSelectionOnClick
+          />
+        </form>
+      </Box>
     </Box>
   );
 }

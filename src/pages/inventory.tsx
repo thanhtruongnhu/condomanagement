@@ -7,6 +7,7 @@ import {
   MenuItem,
   Modal,
   Select,
+  Skeleton,
   Stack,
   Switch,
   Typography,
@@ -22,6 +23,7 @@ import Chip from "../components/common/Chip";
 import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import dayjs from "dayjs";
+import ChipNew from "../components/common/ChipNew";
 
 const columns: GridColDef[] = [
   { field: "title", headerName: "Room", width: 200 },
@@ -30,7 +32,7 @@ const columns: GridColDef[] = [
     headerName: "Type",
     width: 250,
     renderCell: (params) => {
-      return <Chip type={params.row.type} marginLeft={"0"} />;
+      return <ChipNew typeId={params.row.type} marginLeft={"0"} />;
     },
   },
   {
@@ -75,46 +77,46 @@ function Inventory() {
     const fetchApartmentData = async () => {
       try {
         // Retrieve the token from localStorage
-        const token = localStorage.getItem('token');
-  
+        const token = localStorage.getItem("token");
+
         // Check if the token is available
         if (!token) {
-          console.error('Token not available. Please authenticate first.');
+          console.error("Token not available. Please authenticate first.");
           return;
         }
-  
+
         // Fetch apartment data using your domain, including the token in the headers
-        const response = await fetch('https://globalsolusap.com/apartment/', {
+        const response = await fetch("https://globalsolusap.com/apartment/", {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         });
-  
+
         if (!response.ok) {
           throw new Error(`HTTP error! Status: ${response.status}`);
         }
-  
+
         const data = await response.json();
-  
+
         // Map the data from the endpoint to the 'rows' array format
         const mappedData = data.map((item: ApartmentData, index: number) => ({
           id: index + 1,
           title: item.apartmentNumber,
-          type: item.apartmentType.aptCode,
+          type: item.apartmentType._id,
           availableDate: item.aptAvailableFrom
             ? new Date(item.aptAvailableFrom).toLocaleDateString()
-            : 'Not Available',
+            : "Not Available",
           _id: item._id,
           aptAvailability: item.aptAvailability,
         }));
-  
+
         // Set the mapped data to 'rows'
         setApartmentData(mappedData);
       } catch (error) {
-        console.error('Error fetching apartment data:', error);
+        console.error("Error fetching apartment data:", error);
       }
     };
-  
+
     fetchApartmentData();
   }, [updatedData]);
 
@@ -129,14 +131,14 @@ function Inventory() {
   const handleUpdateRoom = async (putData: putData, roomId: string) => {
     try {
       // Retrieve the token from localStorage
-      const token = localStorage.getItem('token');
-  
+      const token = localStorage.getItem("token");
+
       // Check if the token is available
       if (!token) {
-        console.error('Token not available. Please authenticate first.');
+        console.error("Token not available. Please authenticate first.");
         return;
       }
-  
+
       // Fetch room update using your domain, including the token in the headers
       const response = await fetch(
         `https://globalsolusap.com/apartment/update-availability/${roomId}`,
@@ -149,7 +151,7 @@ function Inventory() {
           body: JSON.stringify(putData),
         }
       );
-  
+
       if (!response.ok) {
         throw new Error(`HTTP error! Status: ${response.status}`);
       }
@@ -157,7 +159,6 @@ function Inventory() {
       console.error("Error updating room data:", error);
     }
   };
-  
 
   const actionColumn: GridColDef = {
     field: "availableforrent",
@@ -181,9 +182,7 @@ function Inventory() {
 
         // turning OFF
         if (!updatedData[params.row.id - 1].aptAvailability) {
-          const confirmation = window.confirm(
-            "Mark this room as UNAVAILABLE?"
-          );
+          const confirmation = window.confirm("Mark this room as UNAVAILABLE?");
 
           if (confirmation) {
             // If the user confirms, proceed with turning off the toggle
@@ -294,7 +293,11 @@ function Inventory() {
           </Typography>
 
           {!apartmentData.length ? (
-            "There are no properties"
+            <Box sx={{ width: 300 }}>
+              <Skeleton />
+              <Skeleton animation="wave" />
+              <Skeleton animation={false} />
+            </Box>
           ) : (
             <>
               {/* FILTER */}
@@ -347,7 +350,7 @@ function Inventory() {
                     },
                   },
                 }}
-                pageSizeOptions={[5]}
+                pageSizeOptions={[100]}
                 // checkboxSelection
                 disableRowSelectionOnClick
               />

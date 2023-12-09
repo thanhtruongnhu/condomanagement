@@ -4,6 +4,7 @@ import {
   IconButton,
   MenuItem,
   Select,
+  Skeleton,
   Switch,
   Typography,
 } from "@mui/material";
@@ -12,6 +13,7 @@ import {
   GridColDef,
   GridValueGetterParams,
   GridRowParams,
+  GridSortModel,
 } from "@mui/x-data-grid";
 import {
   Filter,
@@ -25,11 +27,11 @@ import { useDispatch } from "react-redux";
 import { updateInquiryData } from "../store/inquirySlice";
 
 const columns: GridColDef[] = [
-  { field: "inquirer", headerName: "Inquirer", width: 200 },
+  { field: "inquirer", headerName: "Inquirer", width: 250 },
   {
     field: "type",
     headerName: "Type",
-    width: 200,
+    width: 250,
     renderCell: (params) => {
       return <ChipNew typeId={params.row.typeId} marginLeft={"0"} />;
     },
@@ -37,7 +39,7 @@ const columns: GridColDef[] = [
   {
     field: "inquiryDate",
     headerName: "Inquiry Date",
-    width: 200,
+    width: 250,
     editable: false,
   },
   {
@@ -53,6 +55,13 @@ function Inquiries() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [shouldRefetch, setShouldRefetch] = useState(false);
+  const [sortModel, setSortModel] = useState<GridSortModel>([
+    {
+      field: 'submissionDate', // Specify the field to sort by
+      sort: 'asc', // Specify the sort direction ('asc' or 'desc')
+    },
+  ]);
+
   const handleDeleteInquiries = async (aptTypeID: string, inquiryIds: any) => {
     try {
       const idsArray = Array.isArray(inquiryIds) ? inquiryIds : [inquiryIds];
@@ -115,7 +124,9 @@ function Inquiries() {
           id: index + 1,
           inquirer: `${item.firstName} ${item.lastName}`,
           typeId: item.aptTypeId,
-          inquiryDate: new Date(item.inquiryDate).toLocaleString('en-US', { timeZone: 'UTC' }),
+          inquiryDate: new Date(item.inquiryDate).toLocaleString("en-US", {
+            timeZone: "UTC",
+          }),
           _id: item._id,
         }));
 
@@ -185,7 +196,11 @@ function Inquiries() {
           </Typography>
 
           {!inquiryData.length ? (
-            "There are no properties"
+            <Box sx={{ width: 300 }}>
+              <Skeleton />
+              <Skeleton animation="wave" />
+              <Skeleton animation={false} />
+            </Box>
           ) : (
             <>
               {/* FILTER */}
@@ -238,9 +253,10 @@ function Inquiries() {
                     },
                   },
                 }}
-                pageSizeOptions={[5]}
+                pageSizeOptions={[1000000]}
                 checkboxSelection
                 disableRowSelectionOnClick
+                sortModel={sortModel}
               />
             </>
           )}

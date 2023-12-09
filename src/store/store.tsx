@@ -7,6 +7,7 @@ import aptTypeSlice from "./aptTypeSlice";
 import inquirySlice from "./inquirySlice";
 import applicationSlice from "./applicationSlice";
 import waitlistSlice from "./waitlistSlice";
+import roomSlice from "./roomSlice";
 
 // Persist configuration
 const persistConfig = {
@@ -20,6 +21,7 @@ const rootReducer = combineReducers({
   inquiryData: inquirySlice,
   applicationData: applicationSlice,
   waitlistData: waitlistSlice,
+  roomData: roomSlice,
 });
 
 // Enhanced reducer with persistence capability

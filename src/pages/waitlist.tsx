@@ -4,6 +4,7 @@ import {
   IconButton,
   MenuItem,
   Select,
+  Skeleton,
   Switch,
   Typography,
 } from "@mui/material";
@@ -12,6 +13,7 @@ import {
   GridColDef,
   GridValueGetterParams,
   GridRowParams,
+  GridSortModel,
 } from "@mui/x-data-grid";
 import {
   Filter,
@@ -56,11 +58,11 @@ function findTimeDifferenceFromNow(dateString: string): string {
 }
 
 const columns: GridColDef[] = [
-  { field: "waitlistApplicant", headerName: "Waitlist applicant", width: 200 },
+  { field: "waitlistApplicant", headerName: "Waitlist applicant", width: 250 },
   {
     field: "type",
     headerName: "Type",
-    width: 200,
+    width: 250,
     renderCell: (params) => {
       return <ChipNew typeId={params.row.typeId} marginLeft={"0"} />;
     },
@@ -68,7 +70,7 @@ const columns: GridColDef[] = [
   {
     field: "contactDate",
     headerName: "Contact Date",
-    width: 200,
+    width: 250,
     editable: false,
   },
   {
@@ -84,6 +86,12 @@ function Waitlist() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [shouldRefetch, setShouldRefetch] = useState(false);
+  const [sortModel, setSortModel] = useState<GridSortModel>([
+    {
+      field: 'submissionDate', // Specify the field to sort by
+      sort: 'asc', // Specify the sort direction ('asc' or 'desc')
+    },
+  ]);
 
   useEffect(() => {
     const fetchWaitlistData = async () => {
@@ -118,7 +126,9 @@ function Waitlist() {
           id: index + 1,
           waitlistApplicant: `${item.firstName} ${item.lastName}`,
           typeId: item.aptTypeId,
-          contactDate: new Date(item.waitlistedDate).toLocaleString('en-US', { timeZone: 'UTC' }),
+          contactDate: new Date(item.waitlistedDate).toLocaleString("en-US", {
+            timeZone: "UTC",
+          }),
           waittime: findTimeDifferenceFromNow(item.waitlistedDate),
           _id: item._id,
         }));
@@ -215,7 +225,11 @@ function Waitlist() {
             Wait List
           </Typography>
           {!applicationData.length ? (
-            "There are no properties"
+            <Box sx={{ width: 300 }}>
+              <Skeleton />
+              <Skeleton animation="wave" />
+              <Skeleton animation={false} />
+            </Box>
           ) : (
             <>
               {/* FILTER */}
@@ -268,9 +282,10 @@ function Waitlist() {
                     },
                   },
                 }}
-                pageSizeOptions={[5]}
+                pageSizeOptions={[1000000]}
                 checkboxSelection
                 disableRowSelectionOnClick
+                sortModel={sortModel}
               />
             </>
           )}

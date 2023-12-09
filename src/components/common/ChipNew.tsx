@@ -4,16 +4,16 @@ import getAptType from "./getAptType";
 
 function ChipNew({ typeId, marginLeft }: TypeNew) {
   const selectBackgroundColor = (type: string) => {
-    switch (type) {
-      case "Single A":
+    switch (typeId) {
+      case "652423bb11b2d3123e9e93e7":
         return "#dadefa";
-      case "Single B":
+      case "652423bb11b2d3123e9e93e8":
         return "#E8DBF8";
-      case "Double A":
+      case "652423bb11b2d3123e9e93e9":
         return "#F8EBDB";
-      case "Double B":
+      case "652423bb11b2d3123e9e93ea":
         return "#DBF8EA";
-      case "Double C":
+      case "652423bb11b2d3123e9e93eb":
         return "#F6F8DB";
       default:
         return "#f50000"; // Red color to detect missing room type
@@ -21,19 +21,19 @@ function ChipNew({ typeId, marginLeft }: TypeNew) {
   };
 
   const selectTextColor = (type: string) => {
-    switch (type) {
-      case "Single A":
+    switch (typeId) {
+      case "652423bb11b2d3123e9e93e7":
         return "#5563E2";
-      case "Single B":
+      case "652423bb11b2d3123e9e93e8":
         return "#B555E2";
-      case "Double A":
+      case "652423bb11b2d3123e9e93e9":
         return "#E2B255";
-      case "Double B":
+      case "652423bb11b2d3123e9e93ea":
         return "#2AAF60";
-      case "Double C":
+      case "652423bb11b2d3123e9e93eb":
         return "#CDC505";
       default:
-        return "#fffff"; // Red color to detect missing room type
+        return "#fffff"; // black color to detect missing room type
     }
   };
 
