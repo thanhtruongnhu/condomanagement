@@ -23,6 +23,7 @@ import { Address, ApplicationData } from "../interfaces/application";
 import formatDate from "../components/common/DateFormatter";
 import { DataItem } from "../interfaces/common";
 import { idID } from "@mui/material/locale";
+import VisibilityIcon from '@mui/icons-material/Visibility';
 
 function booleanToYesNo(value: boolean): string {
   return value ? "Yes" : "No";
@@ -357,10 +358,10 @@ const ApplicationDetails = () => {
 
           <Box mt={"20px"}>
             <CustomButton
-              title={"Download"}
+              title={"View"}
               backgroundColor="#475BE8"
               color="#FCFCFC"
-              icon={<CloudDownloadRounded />}
+              icon={<VisibilityIcon />}
               handleClick={() =>
                 fetchDocumentPreview(
                   applicationDetails.creditReport.documentName

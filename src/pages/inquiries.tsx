@@ -63,7 +63,7 @@ function Inquiries() {
   const [shouldRefetch, setShouldRefetch] = useState(false);
   const [sortModel, setSortModel] = useState<GridSortModel>([
     {
-      field: "submissionDate", // Specify the field to sort by
+      field: "inquiryDate", // Specify the field to sort by
       sort: "asc", // Specify the sort direction ('asc' or 'desc')
     },
   ]);
