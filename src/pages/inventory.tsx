@@ -301,7 +301,7 @@ function Inventory() {
           ) : (
             <>
               {/* FILTER */}
-              {/* <Select
+              <Select
                 // fullWidth
                 sx={{ width: "200px" }}
                 variant="outlined"
@@ -330,7 +330,7 @@ function Inventory() {
                     {type}
                   </MenuItem>
                 ))}
-              </Select> */}
+              </Select>
 
               {/* DATA TABLE */}
               <DataGrid
