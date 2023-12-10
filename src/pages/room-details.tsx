@@ -29,6 +29,7 @@ import {
 } from "../interfaces/common";
 import formatDate from "../components/common/DateFormatter";
 import DescriptionCard from "../components/common/DescriptionCard";
+import ChipNew from "../components/common/ChipNew";
 
 const RoomDetails = () => {
   const navigate = useNavigate();
@@ -197,8 +198,8 @@ const RoomDetails = () => {
           </Typography>
 
           {apartmentData ? (
-            <Chip
-              type={apartmentData.apartmentType.aptCode}
+            <ChipNew
+              typeId={apartmentData.apartmentType._id}
               marginLeft={"20px"}
             />
           ) : (

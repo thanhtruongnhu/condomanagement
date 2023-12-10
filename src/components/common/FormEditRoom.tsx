@@ -19,6 +19,7 @@ import { Add, Delete, PublishedWithChangesSharp } from "@mui/icons-material";
 import PublishIcon from "@mui/icons-material/Publish";
 import Chip from "./Chip";
 import { ApartmentData } from "../../interfaces/property";
+import ChipNew from "./ChipNew";
 
 const FormEditRoom = ({ type, propertyDetails }: FormProps) => {
   const navigate = useNavigate();
@@ -215,8 +216,8 @@ const FormEditRoom = ({ type, propertyDetails }: FormProps) => {
                       {`Room ${propertyDetails.apartmentNumber}`}
                     </Typography>
 
-                    <Chip
-                      type={propertyDetails.apartmentType.aptCode}
+                    <ChipNew
+                      typeId={propertyDetails.apartmentType._id}
                       marginLeft={"20px"}
                     />
                   </Grid>

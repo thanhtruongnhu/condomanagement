@@ -4,6 +4,7 @@ import {
   IconButton,
   MenuItem,
   Select,
+  SelectChangeEvent,
   Switch,
   Typography,
 } from "@mui/material";
@@ -17,16 +18,16 @@ import {
   Filter,
   CurrentFilterValues,
   ApartmentData,
+  ApartmentDataMapped,
 } from "../interfaces/property";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { useNavigate } from "react-router-dom";
-import { Type } from "../interfaces/common";
+import { DataItem, Type } from "../interfaces/common";
 import Chip from "../components/common/Chip";
 import { useDispatch } from "react-redux";
-import { updateApplicationData } from "../store/applicationSlice";
-import { ApplicationData } from "../interfaces/application";
 import ChipNew from "../components/common/ChipNew";
 import { updateRoomData } from "../store/roomSlice";
+import { roomTypeToIdMap } from "../components/common/IdMapping";
 
 const columns: GridColDef[] = [
   { field: "roomNumber", headerName: "Room number", width: 150 },
@@ -59,7 +60,10 @@ const columns: GridColDef[] = [
 ];
 
 function Rooms() {
-  const [roomData, setRoomData] = useState<ApplicationData[]>([]);
+  const [roomData, setRoomData] = useState<ApartmentDataMapped[]>([]);
+  const [originalRoomData, setOriginalRoomData] = useState<
+    ApartmentDataMapped[]
+  >([]);
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
@@ -92,24 +96,29 @@ function Rooms() {
         const data = await response.json();
         dispatch(updateRoomData(data));
         // Map the data from the endpoint to the 'roomData' array format
-        const mappedData = data.map((item: ApartmentData, index: number) => ({
-          id: index + 1,
-          roomNumber: item.apartmentNumber,
-          type: item.apartmentType._id,
-          mainTenantName: `${item.tenants[0].firstName} ${item.tenants[0].lastName}`,
-          startDate: new Date(item.contractStartDate).toLocaleDateString(
-            "en-US",
-            {
-              timeZone: "UTC",
-            }
-          ),
-          endDate: new Date(item.contractEndDate).toLocaleDateString("en-US", {
-            timeZone: "UTC",
-          }),
-          _id: item._id,
-        }));
+        const mappedData: ApartmentDataMapped[] = data.map(
+          (item: ApartmentData, index: number) => ({
+            id: index + 1,
+            roomNumber: item.apartmentNumber,
+            type: item.apartmentType._id,
+            mainTenantName: `${item.tenants[0].firstName} ${item.tenants[0].lastName}`,
+            startDate: new Date(item.contractStartDate).toLocaleDateString(
+              "en-US",
+              {
+                timeZone: "UTC",
+              }
+            ),
+            endDate: new Date(item.contractEndDate).toLocaleDateString(
+              "en-US",
+              {
+                timeZone: "UTC",
+              }
+            ),
+            _id: item._id,
+          })
+        );
 
-        // Set the mapped data to 'roomData'
+        setOriginalRoomData(mappedData);
         setRoomData(mappedData);
       } catch (error) {
         console.error("Error fetching room data:", error);
@@ -125,12 +134,27 @@ function Rooms() {
     navigate(`${pathName}show/${params.row._id}`);
   };
 
-  const setFilters = (newFilter: Filter) => {
-    setCurrentFilterValues(newFilter);
+  const setFilters = (selectedType: string) => {
+    if (selectedType === "") {
+      setRoomData(originalRoomData);
+    } else {
+      const roomId = roomTypeToIdMap[selectedType];
+      const filteredData = originalRoomData.filter(
+        (room) => room.type === roomId
+      );
+      setRoomData(filteredData);
+    }
   };
 
-  const [currentFilterValues, setCurrentFilterValues] =
-    useState<CurrentFilterValues>({});
+  const [currentFilterValues, setCurrentFilterValues] = useState<CurrentFilterValues>({ propertyType: "" });
+
+  const handleSelectChange = (event: SelectChangeEvent<string>) => {
+    const selectedType = event.target.value;
+    setCurrentFilterValues({ ...currentFilterValues, propertyType: selectedType });
+    setFilters(selectedType);
+  };
+  
+
 
   return (
     <Box mx={"20px"} mb={"40px"}>
@@ -167,24 +191,13 @@ function Rooms() {
             displayEmpty
             required
             inputProps={{ "aria-label": "Without label" }}
-            defaultValue=""
-            value={currentFilterValues.propertyType || ""}
-            onChange={(e) => {
-              const newFilter = {
-                propertyType: e.target.value,
-              };
-              setFilters(newFilter);
-            }}
+            defaultValue="All"
+            value={currentFilterValues.propertyType}
+            onChange={handleSelectChange}
           >
             <MenuItem value="">All</MenuItem>
-            {[
-              "Single Suite A",
-              "Single Suite B ♿",
-              "Double Suite A",
-              "Double Suite B",
-              "Double Suite C",
-            ].map((type) => (
-              <MenuItem key={type} value={type.toLowerCase()}>
+            {Object.keys(roomTypeToIdMap).map((type) => (
+              <MenuItem key={type} value={type}>
                 {type}
               </MenuItem>
             ))}

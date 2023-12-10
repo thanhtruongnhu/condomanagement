@@ -4,6 +4,7 @@ import {
   IconButton,
   MenuItem,
   Select,
+  SelectChangeEvent,
   Skeleton,
   Switch,
   Typography,
@@ -19,6 +20,7 @@ import {
   Filter,
   CurrentFilterValues,
   WaitlistData,
+  InquiryDataMapped,
 } from "../interfaces/property";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { useNavigate, useParams } from "react-router-dom";
@@ -27,6 +29,8 @@ import { useDispatch } from "react-redux";
 import ChipNew from "../components/common/ChipNew";
 import { updateWaitlistData } from "../store/waitlistSlice";
 import { ApplicationData } from "../interfaces/application";
+import { selectInquiryData } from "../store/inquirySlice";
+import { roomTypeToIdMap } from "../components/common/IdMapping";
 
 function findTimeDifferenceFromNow(dateString: string): string {
   const currentDate = new Date();
@@ -82,14 +86,17 @@ const columns: GridColDef[] = [
 ];
 
 function Waitlist() {
-  const [applicationData, setApplicationData] = useState<ApplicationData[]>([]);
+  const [waitlistData, setWaitlistData] = useState<InquiryDataMapped[]>([]);
+  const [originalWaitlistData, setOriginalWaitlistData] = useState<
+    InquiryDataMapped[]
+  >([]);
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [shouldRefetch, setShouldRefetch] = useState(false);
   const [sortModel, setSortModel] = useState<GridSortModel>([
     {
-      field: 'submissionDate', // Specify the field to sort by
-      sort: 'asc', // Specify the sort direction ('asc' or 'desc')
+      field: "submissionDate", // Specify the field to sort by
+      sort: "asc", // Specify the sort direction ('asc' or 'desc')
     },
   ]);
 
@@ -133,8 +140,8 @@ function Waitlist() {
           _id: item._id,
         }));
 
-        // Set the mapped data to 'rows'
-        setApplicationData(mappedData);
+        setOriginalWaitlistData(mappedData);
+        setWaitlistData(mappedData);
       } catch (error) {
         console.error("Error fetching waitlist data:", error);
       }
@@ -177,12 +184,29 @@ function Waitlist() {
     navigate(`${pathName}${params.row._id}`);
   };
 
-  const setFilters = (newFilter: Filter) => {
-    setCurrentFilterValues(newFilter);
+  const setFilters = (selectedType: string) => {
+    if (selectedType === "") {
+      setWaitlistData(originalWaitlistData);
+    } else {
+      const roomId = roomTypeToIdMap[selectedType];
+      const filteredData = originalWaitlistData.filter(
+        (room) => room.typeId === roomId
+      );
+      setWaitlistData(filteredData);
+    }
   };
 
   const [currentFilterValues, setCurrentFilterValues] =
-    useState<CurrentFilterValues>({});
+    useState<CurrentFilterValues>({ propertyType: "" });
+
+  const handleSelectChange = (event: SelectChangeEvent<string>) => {
+    const selectedType = event.target.value;
+    setCurrentFilterValues({
+      ...currentFilterValues,
+      propertyType: selectedType,
+    });
+    setFilters(selectedType);
+  };
 
   const actionColumn: GridColDef = {
     field: "delete",
@@ -224,71 +248,51 @@ function Waitlist() {
           <Typography fontSize={25} fontWeight={700} color="#11142d">
             Wait List
           </Typography>
-          {!applicationData.length ? (
-            <Box sx={{ width: 300 }}>
-              <Skeleton />
-              <Skeleton animation="wave" />
-              <Skeleton animation={false} />
-            </Box>
-          ) : (
-            <>
-              {/* FILTER */}
-              <Select
-                // fullWidth
-                sx={{ width: "200px" }}
-                variant="outlined"
-                color="info"
-                displayEmpty
-                required
-                inputProps={{ "aria-label": "Without label" }}
-                defaultValue=""
-                value={currentFilterValues.propertyType || ""}
-                onChange={(e) => {
-                  const newFilter = {
-                    propertyType: e.target.value,
-                  };
-                  setFilters(newFilter);
-                }}
-              >
-                <MenuItem value="">All</MenuItem>
-                {[
-                  "Single Suite A",
-                  "Single Suite B ♿",
-                  "Double Suite A",
-                  "Double Suite B",
-                  "Double Suite C",
-                ].map((type) => (
-                  <MenuItem key={type} value={type.toLowerCase()}>
-                    {type}
-                  </MenuItem>
-                ))}
-              </Select>
 
-              {/* DATA TABLE */}
-              <DataGrid
-                rows={applicationData}
-                columns={[...columns, actionColumn]}
-                onRowClick={handleRowClick}
-                initialState={{
-                  // pagination: {
-                  //   paginationModel: {
-                  //     pageSize: 5,
-                  //   },
-                  // },
-                  columns: {
-                    columnVisibilityModel: {
-                      // Hidden columns
-                      _id: false,
-                    },
-                  },
-                }}
-                pageSizeOptions={[1000000]}
-                checkboxSelection
-                disableRowSelectionOnClick
-                sortModel={sortModel}
-              />
-            </>
-          )}
+          {/* FILTER */}
+          <Select
+            // fullWidth
+            sx={{ width: "200px" }}
+            variant="outlined"
+            color="info"
+            displayEmpty
+            required
+            inputProps={{ "aria-label": "Without label" }}
+            defaultValue="All"
+            value={currentFilterValues.propertyType}
+            onChange={handleSelectChange}
+          >
+            <MenuItem value="">All</MenuItem>
+            {Object.keys(roomTypeToIdMap).map((type) => (
+              <MenuItem key={type} value={type}>
+                {type}
+              </MenuItem>
+            ))}
+          </Select>
+
+          {/* DATA TABLE */}
+          <DataGrid
+            rows={waitlistData}
+            columns={[...columns, actionColumn]}
+            onRowClick={handleRowClick}
+            initialState={{
+              // pagination: {
+              //   paginationModel: {
+              //     pageSize: 5,
+              //   },
+              // },
+              columns: {
+                columnVisibilityModel: {
+                  // Hidden columns
+                  _id: false,
+                },
+              },
+            }}
+            pageSizeOptions={[1000000]}
+            checkboxSelection
+            disableRowSelectionOnClick
+            sortModel={sortModel}
+          />
         </form>
       </Box>
     </Box>

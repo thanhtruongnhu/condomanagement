@@ -113,6 +113,53 @@ export interface ApartmentData {
   occupants: Occupant[];
 }
 
+export interface ApartmentDataMapped {
+  id: number;
+  roomNumber: string;
+  type: string;
+  mainTenantName: string;
+  startDate: string;
+  endDate: string;
+  _id: string;
+}
+
+export interface InventoryDataMapped {
+  id: number;
+  title: string;
+  type: string;
+  availableDate: string;
+  aptAvailability: boolean;
+  _id: string;
+  aptAvailableFrom: string;
+}
+
+export interface ApplicationDataMapped {
+  id: number;
+  applicantName: string;
+  typeId: string;
+  submissionDate: string;
+  moveinDate: string;
+  _id: string;
+  openhouseVisit: boolean;
+}
+
+export interface InquiryDataMapped {
+  id: number;
+  waitlistApplicant: string;
+  typeId: string;
+  contactDate: string;
+  waittime: string;
+  _id: string;
+}
+
+export interface WaitlistDataMapped {
+  id: number;
+  inquirer: string;
+  typeId: string;
+  inquiryDate: string;
+  _id: string;
+}
+
 export interface putData {
   aptAvailability: boolean;
   aptAvailableFrom: string;
