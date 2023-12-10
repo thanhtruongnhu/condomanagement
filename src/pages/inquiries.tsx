@@ -130,7 +130,7 @@ function Inquiries() {
           id: index + 1,
           inquirer: `${item.firstName} ${item.lastName}`,
           typeId: item.aptTypeId,
-          inquiryDate: new Date(item.inquiryDate).toLocaleString("en-US", {
+          inquiryDate: new Date(item.inquiryDate).toLocaleDateString("en-US", {
             timeZone: "UTC",
           }),
           _id: item._id,
