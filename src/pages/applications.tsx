@@ -112,10 +112,9 @@ function Applications() {
           id: index + 1,
           applicantName: `${item.firstName} ${item.lastName}`,
           typeId: item.aptTypeId,
-          submissionDate: new Date(item.applicationDate).toLocaleString(
-            "en-US",
-            { timeZone: "UTC" }
-          ),
+          submissionDate: new Date(item.applicationDate).toLocaleDateString("en-US", {
+            timeZone: "UTC",
+          }),
           moveinDate: new Date(item.moveInDate).toLocaleDateString("en-US", {
             timeZone: "UTC",
           }),
