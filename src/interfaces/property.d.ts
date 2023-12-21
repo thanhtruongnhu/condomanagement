@@ -73,7 +73,6 @@ export interface Tenant {
 }
 
 export interface CarModel {
-  _id: string;
   make: string;
   model: string;
   color: string;
@@ -81,7 +80,6 @@ export interface CarModel {
 }
 
 export interface Occupant {
-  _id: string;
   name: string;
   dob: dayjs;
   relationToApplicant: string;
@@ -110,7 +108,6 @@ export interface ApartmentData {
   aptAvailableFrom: string;
   aptAvailability: boolean;
   tenants: Tenant[];
-  occupants: Occupant[];
 }
 
 export interface ApartmentDataMapped {

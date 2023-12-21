@@ -41,7 +41,7 @@ export interface FormProps {
   // handleSubmit: FormEventHandler<HTMLFormElement> | undefined;
   // handleImageChange: (file) => void;
   // onFinishHandler: (data: FieldValues) => Promise<void> | void;
-  propertyDetails: ApartmentData | null;
+  propertyDetails: ApartmentData;
 }
 
 export interface FormProps1 {

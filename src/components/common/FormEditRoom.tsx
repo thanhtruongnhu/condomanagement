@@ -29,37 +29,72 @@ const FormEditRoom = ({ type, propertyDetails }: FormProps) => {
   const isSmallScreen = useMediaQuery(Theme.breakpoints.down("sm"));
   const [dobMain, setDobMain] = React.useState<Dayjs | null>(null);
 
-  const [formData, setFormData] = React.useState<ApartmentData | null>(
-    propertyDetails
-  );
-
+  const [formData, setFormData] =
+    React.useState<ApartmentData>(propertyDetails);
   React.useEffect(() => {
     if (propertyDetails !== null) {
       setFormData(propertyDetails);
     }
   }, [propertyDetails]);
 
-  // const handleFieldChangeBACKUP = (fieldName: string, value: string) => {
-  //   if (formData) {
-  //     setFormData((prevData) => {
-  //       if (prevData) {
-  //         return {
-  //           ...prevData,
-  //           [fieldName]: value,
-  //         };
-  //       }
-  //       return prevData;
-  //     });
-  //   }
-  // };
-
   const handleCreateOccupant = (index: number) => {
+    // console.log(formData?.tenants[0].occupants.length);
+
+    // const newFormData = formData;
+    // newFormData?.tenants[0]?.occupants = [];
+
+    // Update the state with the modified data
+    if (index === 0) {
+      formData.tenants.push({
+        firstName: "",
+        lastName: "",
+        email: "",
+        phoneNumber: "",
+        contractDocId: "",
+        creditReportId: "",
+        dob: dayjs(), // You might want to initialize this with the current date or another default value
+        carModel: [],
+        occupants: [],
+      });
+      const mainTenant = formData.tenants[0];
+      mainTenant?.occupants.push({
+        name: "",
+        dob: "",
+        relationToApplicant: "", // Adjust relation as needed
+      });
+
+      // Update the state with the modified data
+      setFormData((prevData) => ({
+        ...prevData,
+        tenants: [mainTenant], // Update tenants array
+      }));
+    }
     handleFieldChange(`tenants.0.occupants.${index}.name`, "");
     handleFieldChange(`tenants.0.occupants.${index}.dob`, "");
     handleFieldChange(`tenants.0.occupants.${index}.relationToApplicant`, "");
   };
 
   const handleCreateVehicle = (index: number) => {
+    if (index === 0) {
+      formData.tenants.push({
+        firstName: "",
+        lastName: "",
+        email: "",
+        phoneNumber: "",
+        contractDocId: "",
+        creditReportId: "",
+        dob: dayjs(), // You might want to initialize this with the current date or another default value
+        carModel: [],
+        occupants: [],
+      });
+    }
+    const mainTenant = formData.tenants[0];
+    mainTenant?.carModel.push({
+      make: "",
+      model: "",
+      color: "",
+      licensePlate: "",
+    });
     handleFieldChange(`tenants.0.carModel.${index}.make`, "");
     handleFieldChange(`tenants.0.carModel.${index}.model`, "");
     handleFieldChange(`tenants.0.carModel.${index}.color`, "");
@@ -151,17 +186,14 @@ const FormEditRoom = ({ type, propertyDetails }: FormProps) => {
       }
 
       // Fetch room update using your domain, including the token in the headers
-      const response = await fetch(
-        `https://globalsolusap.com/apartment/${id}`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify(formData),
-        }
-      );
+      const response = await fetch(`https://globalsolusap.com/apartment/${id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(formData),
+      });
 
       if (!response.ok) {
         throw new Error(`HTTP error! Status: ${response.status}`);
@@ -248,7 +280,7 @@ const FormEditRoom = ({ type, propertyDetails }: FormProps) => {
                       id="outlined-basic"
                       color="info"
                       variant="outlined"
-                      value={formData.tenants[0].firstName}
+                      value={formData.tenants[0]?.firstName ?? ""}
                       // onChange={(e) =>
                       //   handleNestedFieldChange("firstName", e.target.value)
                       // }
@@ -274,7 +306,7 @@ const FormEditRoom = ({ type, propertyDetails }: FormProps) => {
                       id="outlined-basic"
                       color="info"
                       variant="outlined"
-                      value={formData.tenants[0].lastName}
+                      value={formData.tenants[0]?.lastName ?? ""}
                       // onChange={(e) =>
                       //   handleNestedFieldChange("lastName", e.target.value)
                       // }
@@ -301,7 +333,7 @@ const FormEditRoom = ({ type, propertyDetails }: FormProps) => {
                       </FormHelperText>
                     </FormControl>
                     <DatePicker
-                      defaultValue={dayjs(formData.tenants[0].dob)}
+                      defaultValue={dayjs(formData.tenants[0]?.dob ?? "")}
                       onChange={(newValue) =>
                         handleFieldChange(
                           `tenants.0.dob`,
@@ -327,7 +359,7 @@ const FormEditRoom = ({ type, propertyDetails }: FormProps) => {
                       id="outlined-basic"
                       color="info"
                       variant="outlined"
-                      value={formData.tenants[0].phoneNumber}
+                      value={formData.tenants[0]?.phoneNumber ?? ""}
                       // onChange={(e) =>
                       //   handleNestedFieldChange("phoneNumber", e.target.value)
                       // }
@@ -357,7 +389,7 @@ const FormEditRoom = ({ type, propertyDetails }: FormProps) => {
                     id="outlined-basic"
                     color="info"
                     variant="outlined"
-                    value={formData.tenants[0].email}
+                    value={formData.tenants[0]?.email ?? ""}
                     onChange={(e) =>
                       handleFieldChange(`tenants.0.email`, e.target.value)
                     }
@@ -483,8 +515,8 @@ const FormEditRoom = ({ type, propertyDetails }: FormProps) => {
                 </Box>
 
                 <div>
-                  {formData.tenants[0].occupants.length > 0 ? (
-                    formData.tenants[0].occupants.map((occupant, index) => (
+                  {formData.tenants[0]?.occupants?.length > 0 ? (
+                    formData.tenants[0]?.occupants.map((occupant, index) => (
                       <div key={index}>
                         <Stack
                           key={index}
@@ -600,7 +632,9 @@ const FormEditRoom = ({ type, propertyDetails }: FormProps) => {
                   color="#FCFCFC"
                   icon={<Add />}
                   handleClick={() => {
-                    handleCreateOccupant(formData.tenants[0].occupants.length);
+                    handleCreateOccupant(
+                      formData.tenants[0]?.occupants?.length ?? 0
+                    );
                   }}
                 />
 
@@ -612,7 +646,7 @@ const FormEditRoom = ({ type, propertyDetails }: FormProps) => {
                 </Box>
 
                 <div>
-                  {formData.tenants[0].carModel.length > 0 ? (
+                  {formData.tenants[0]?.carModel?.length > 0 ? (
                     formData.tenants[0].carModel.map((car, index) => (
                       <div key={index}>
                         <Stack
@@ -756,7 +790,9 @@ const FormEditRoom = ({ type, propertyDetails }: FormProps) => {
                   color="#FCFCFC"
                   icon={<Add />}
                   handleClick={() => {
-                    handleCreateVehicle(formData.tenants[0].carModel.length);
+                    handleCreateVehicle(
+                      formData.tenants[0]?.carModel?.length ?? 0
+                    );
                   }}
                 />
 

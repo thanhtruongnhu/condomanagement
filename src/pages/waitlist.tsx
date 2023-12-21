@@ -133,9 +133,9 @@ function Waitlist() {
           id: index + 1,
           waitlistApplicant: `${item.firstName} ${item.lastName}`,
           typeId: item.aptTypeId,
-          contactDate: new Date(item.waitlistedDate).toLocaleDateString("en-US", {
-            timeZone: "UTC",
-          }),
+          contactDate: new Date(item.waitlistedDate).toLocaleDateString(
+            "en-US"
+          ),
           waittime: findTimeDifferenceFromNow(item.waitlistedDate),
           _id: item._id,
         }));

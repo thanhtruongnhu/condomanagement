@@ -12,6 +12,7 @@ import {
   DataGrid,
   GridColDef,
   GridRowParams,
+  GridSortModel,
   GridValueGetterParams,
 } from "@mui/x-data-grid";
 import {
@@ -53,7 +54,7 @@ const columns: GridColDef[] = [
   },
   {
     field: "endDate",
-    headerName: "Start-of-contract Date",
+    headerName: "End-of-contract Date",
     width: 250,
     editable: false,
   },
@@ -66,6 +67,12 @@ function Rooms() {
   >([]);
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const [sortModel, setSortModel] = useState<GridSortModel>([
+    {
+      field: "type", // Specify the field to sort by
+      sort: "asc", // Specify the sort direction ('asc' or 'desc')
+    },
+  ]);
 
   // 1. Fetch all applications
   useEffect(() => {
@@ -101,19 +108,14 @@ function Rooms() {
             id: index + 1,
             roomNumber: item.apartmentNumber,
             type: item.apartmentType._id,
-            mainTenantName: `${item.tenants[0].firstName} ${item.tenants[0].lastName}`,
+            mainTenantName:
+              item.tenants.length > 0
+                ? `${item.tenants[0].firstName} ${item.tenants[0].lastName}`
+                : "N/A",
             startDate: new Date(item.contractStartDate).toLocaleDateString(
-              "en-US",
-              {
-                timeZone: "UTC",
-              }
+              "en-US"
             ),
-            endDate: new Date(item.contractEndDate).toLocaleDateString(
-              "en-US",
-              {
-                timeZone: "UTC",
-              }
-            ),
+            endDate: new Date(item.contractEndDate).toLocaleDateString("en-US"),
             _id: item._id,
           })
         );
@@ -146,15 +148,17 @@ function Rooms() {
     }
   };
 
-  const [currentFilterValues, setCurrentFilterValues] = useState<CurrentFilterValues>({ propertyType: "" });
+  const [currentFilterValues, setCurrentFilterValues] =
+    useState<CurrentFilterValues>({ propertyType: "" });
 
   const handleSelectChange = (event: SelectChangeEvent<string>) => {
     const selectedType = event.target.value;
-    setCurrentFilterValues({ ...currentFilterValues, propertyType: selectedType });
+    setCurrentFilterValues({
+      ...currentFilterValues,
+      propertyType: selectedType,
+    });
     setFilters(selectedType);
   };
-  
-
 
   return (
     <Box mx={"20px"} mb={"40px"}>
@@ -205,6 +209,7 @@ function Rooms() {
 
           {/* DATA TABLE */}
           <DataGrid
+            sortModel={sortModel}
             rows={roomData}
             columns={[...columns]}
             onRowClick={handleRowClick}

@@ -87,54 +87,59 @@ const RoomDetails = () => {
 
   // Create a separate function to process the apartment data and set state
   const processApartmentData = (data: ApartmentData) => {
-    const mainTenant = data.tenants[0];
-    const occupants = data.tenants[0].occupants; // Excluding the main tenant
-    const carModels = data.tenants[0].carModel;
-    const notes = [{ "Notes for this tenant": data.notes }];
+    if (data.tenants && data.tenants.length > 0) {
+      const mainTenant = data.tenants[0];
+      const occupants = mainTenant.occupants || []; // Excluding the main tenant
+      const carModels = mainTenant.carModel || [];
+      const notes = [{ "Notes for this tenant": data.notes }];
 
-    const mockTenantInfo = [
-      {
-        "Main Tenant (Contract holder)": `${mainTenant.firstName} ${mainTenant.lastName}`,
-        "Date of birth": formatDate(mainTenant.dob),
-        "Phone number": mainTenant.phoneNumber,
-        "Email Address": mainTenant.email,
-      },
-    ];
+      const mockTenantInfo = [
+        {
+          "Main Tenant (Contract holder)": `${mainTenant.firstName} ${mainTenant.lastName}`,
+          "Date of birth": formatDate(mainTenant.dob),
+          "Phone number": mainTenant.phoneNumber,
+          "Email Address": mainTenant.email,
+        },
+      ];
 
-    const mockContractInfo = [
-      {
-        "Move-in date": formatDate(data.contractStartDate),
-        "End-of-contract date": formatDate(data.contractEndDate),
-        Rental: `$${data.currentRent}`,
-        Deposit: `$${data.depositAmount}`,
-        "60-day end-of-contract reminder": data.reminder60days,
-        "45-day end-of-contract reminder": data.reminder45days,
-      },
-    ];
+      const mockContractInfo = [
+        {
+          "Move-in date": formatDate(data.contractStartDate),
+          "End-of-contract date": formatDate(data.contractEndDate),
+          Rental: `$${data.currentRent}`,
+          Deposit: `$${data.depositAmount}`,
+          "60-day end-of-contract reminder": data.reminder60days,
+          "45-day end-of-contract reminder": data.reminder45days,
+        },
+      ];
 
-    const mockOtherOccupants = occupants.map((occupant) => {
-      const occupantData = occupant as Occupant; // Explicitly cast to the Occupant type
-      return {
-        "Tenant name": occupantData.name,
-        "Date of birth": formatDate(occupantData.dob),
-        "Relation to main tenant": occupantData.relationToApplicant,
-      };
-    });
+      const mockOtherOccupants = occupants.map((occupant) => {
+        const occupantData = occupant as Occupant; // Explicitly cast to the Occupant type
+        return {
+          "Tenant name": occupantData.name,
+          "Date of birth": formatDate(occupantData.dob),
+          "Relation to main tenant": occupantData.relationToApplicant,
+        };
+      });
 
-    console.log("mockOtherOccupants::", mockOtherOccupants);
+      console.log("mockOtherOccupants::", mockOtherOccupants);
 
-    const mockVehicleInfo = carModels.map((carModel) => ({
-      Make: carModel.make,
-      Model: carModel.model,
-      Color: carModel.color,
-      "License plate #": carModel.licensePlate,
-    }));
+      const mockVehicleInfo = carModels.map((carModel) => ({
+        Make: carModel.make,
+        Model: carModel.model,
+        Color: carModel.color,
+        "License plate #": carModel.licensePlate,
+      }));
 
-    setMockTenantInfo(mockTenantInfo);
-    setMockOtherOccupants(mockOtherOccupants);
-    setMockVehicleInfo(mockVehicleInfo);
-    setmockContractInfo(mockContractInfo);
-    setNotes(notes);
+      setMockTenantInfo(mockTenantInfo);
+      setMockOtherOccupants(mockOtherOccupants);
+      setMockVehicleInfo(mockVehicleInfo);
+      setmockContractInfo(mockContractInfo);
+      setNotes(notes);
+    } else {
+      // Handle the case where there are no tenants
+      console.log("No tenants for this apartment");
+    }
   };
 
   // Call the processing function when apartmentData changes
@@ -224,7 +229,6 @@ const RoomDetails = () => {
           )}
         </Box>
       </Box>
-
       <InfoCard title={"1. Tenant Info"} data={mockTenantInfo} />
       <InfoCard title={"2. Contract Info"} data={mockContractInfo} />
       <InfoCard title={"3. Other Occupants"} data={mockOtherOccupants} />

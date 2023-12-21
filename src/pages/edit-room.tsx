@@ -14,9 +14,7 @@ const EditRoom = () => {
   // };
   // const { data, isLoading, isError } = queryResult;
   const { id } = useParams();
-  const [apartmentData, setApartmentData] = useState<ApartmentData | null>(
-    null
-  );
+  const [apartmentData, setApartmentData] = useState<ApartmentData>();
 
   useEffect(() => {
     const fetchApartmentData = async () => {
