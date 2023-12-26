@@ -24,6 +24,9 @@ import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import dayjs from "dayjs";
 import ChipNew from "../components/common/ChipNew";
+import { modalStyle } from "../components/common/PredefinedMessagesandThemes";
+
+const style = modalStyle;
 
 const columns: GridColDef[] = [
   { field: "title", headerName: "Room", width: 200 },
@@ -54,20 +57,6 @@ const columns: GridColDef[] = [
     editable: false,
   },
 ];
-
-const style = {
-  position: "absolute" as "absolute",
-  top: "50%",
-  left: "50%",
-  transform: "translate(-50%, -50%)",
-  width: 400,
-  bgcolor: "background.paper",
-  border: "2px solid #000",
-  boxShadow: 24,
-  pt: 2,
-  px: 4,
-  pb: 3,
-};
 
 function Inventory() {
   const [apartmentData, setApartmentData] = useState<ApartmentData[]>([]);
@@ -229,6 +218,7 @@ function Inventory() {
           setOpenModal(false); // Close the modal if the date is valid
         }
       };
+
       return (
         <React.Fragment>
           <Switch

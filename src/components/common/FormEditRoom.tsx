@@ -24,8 +24,6 @@ import ChipNew from "./ChipNew";
 const FormEditRoom = ({ type, propertyDetails }: FormProps) => {
   const navigate = useNavigate();
   const { id } = useParams();
-  // console.log("roomData::", propertyDetails);
-
   const isSmallScreen = useMediaQuery(Theme.breakpoints.down("sm"));
   const [dobMain, setDobMain] = React.useState<Dayjs | null>(null);
 
@@ -186,14 +184,17 @@ const FormEditRoom = ({ type, propertyDetails }: FormProps) => {
       }
 
       // Fetch room update using your domain, including the token in the headers
-      const response = await fetch(`https://globalsolusap.com/apartment/${id}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(formData),
-      });
+      const response = await fetch(
+        `https://globalsolusap.com/apartment/${id}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(formData),
+        }
+      );
 
       if (!response.ok) {
         throw new Error(`HTTP error! Status: ${response.status}`);

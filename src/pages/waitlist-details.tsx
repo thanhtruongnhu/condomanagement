@@ -1,20 +1,19 @@
 import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
-import Stack from "@mui/material/Stack";
-// import { useDelete, useShow } from "@refinedev/core";
 import { useParams, useNavigate } from "react-router-dom";
 import Delete from "@mui/icons-material/Delete";
-import Edit from "@mui/icons-material/Edit";
 import ForwardToInboxIcon from "@mui/icons-material/ForwardToInbox";
-
 import CustomButton from "../components/common/CustomButton";
-import SingleSuitA from "../assets/SingleSuite.jpg";
 import { Room, WaitlistData } from "../interfaces/property";
-import { Button, Container, Grid } from "@mui/material";
+import {
+  Button,
+  Container,
+  Grid,
+  Modal,
+  TextField,
+  TextareaAutosize,
+} from "@mui/material";
 import InfoCard from "../components/common/InfoCard";
-import { CloudDownloadRounded } from "@mui/icons-material";
-import Chip from "../components/common/Chip";
-import ApplicationInfoCard from "../components/common/ApplicationInfoCard";
 import { useEffect, useState } from "react";
 import DescriptionCard from "../components/common/DescriptionCard";
 import { useSelector } from "react-redux";
@@ -22,6 +21,16 @@ import { selectWaitlistData } from "../store/waitlistSlice";
 import { DataItem } from "../interfaces/common";
 import formatDate from "../components/common/DateFormatter";
 import ChipNew from "../components/common/ChipNew";
+import { Toaster, toast } from "sonner";
+import {
+  initialWaitlistMessage,
+  initialWaitlistSubject,
+  modalStyle,
+} from "../components/common/PredefinedMessagesandThemes";
+
+const initialSubject = initialWaitlistSubject;
+const initialMessage = initialWaitlistMessage;
+const style = modalStyle;
 
 const WaitlistDetails = () => {
   const navigate = useNavigate();
@@ -29,12 +38,6 @@ const WaitlistDetails = () => {
   const waitlistData = useSelector(selectWaitlistData);
   const [waitlistInfo, setWaitlistInfo] = useState<DataItem[]>([]);
   const [waitlistMessage, setWaitlistMessage] = useState<DataItem[]>([]);
-
-  // Mock function for useDelete (deleting property)
-  const mutate = async ({ resource, id }: { resource: string; id: string }) => {
-    // Mock success, you can add your own logic here
-    console.log(`Deleted property with ID: ${id}`);
-  };
 
   // Find the room details by matching the ID
   const waitlistDetails = !waitlistData
@@ -69,21 +72,6 @@ const WaitlistDetails = () => {
     }
   }, [waitlistDetails]);
 
-  const handleDeleteProperty = () => {
-    if (id) {
-      const response = window.confirm(
-        "Are you sure you want to delete this property?"
-      );
-      if (response) {
-        mutate({
-          resource: "properties",
-          id: id,
-        }).then(() => {
-          navigate("/rooms");
-        });
-      }
-    }
-  };
   const handleDeleteWaitlist = async (aptTypeID: string, waitlistIds: any) => {
     try {
       const idsArray = Array.isArray(waitlistIds) ? waitlistIds : [waitlistIds];
@@ -106,16 +94,94 @@ const WaitlistDetails = () => {
       }
       navigate("/waitlist/");
       console.log("Waitlist item removed successfully");
-      // Optionally, you can handle the response data here if needed
+      toast.success("Your waitlist item has been successfully removed!", {
+        position: "top-center",
+      });
     } catch (error) {
       console.error("Error removing waitlist item:", error);
+      toast.error(
+        "Oops! There's some error happen while we're removing the waitlist item. Please try again later! Thank you 😊",
+        {
+          position: "top-center",
+        }
+      );
     }
   };
+
+  // State to manage the modal open/close and input fields
+  const [isEmailModalOpen, setEmailModalOpen] = useState(false);
+  const [emailMessage, setEmailMessage] = useState(initialMessage);
+  const [emailSubject, setEmailSubject] = useState(initialSubject);
+
+  // Function to handle opening the modal
+  const handleOpenEmailModal = () => {
+    if (waitlistDetails) {
+      const personalizedMessage = initialMessage.replace(
+        "<First Name>",
+        `${waitlistDetails.firstName} ${waitlistDetails.lastName}`
+      );
+      setEmailMessage(personalizedMessage);
+    }
+    setEmailModalOpen(true);
+  };
+  // Function to handle closing the modal
+  const handleCloseEmailModal = () => setEmailModalOpen(false);
+
+  // Function to handle sending the email
+  const handleSendEmail = async () => {
+    const payload = {
+      emails: [waitlistDetails.email],
+      subject: emailSubject,
+      message: emailMessage,
+    };
+
+    const token = localStorage.getItem("token");
+
+    // Replace with your API endpoint
+    const response = await fetch(
+      "https://globalsolusap.com/email/sendEmails/",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(payload),
+      }
+    );
+
+    if (response.ok) {
+      console.log("Email sent successfully");
+      toast.success("Email sent successfully!", {
+        position: "top-center",
+      });
+    } else {
+      console.error("Failed to send email");
+      toast.error(
+        "Oops! There's some error happen while we're sending your email. Please try again later! Thank you 😊",
+        {
+          position: "top-center",
+        }
+      );
+    }
+
+    handleCloseEmailModal();
+  };
+
   return (
     <Container
       maxWidth="lg"
       sx={{ my: 4, bgcolor: "#FFFFFF", borderRadius: 3 }}
     >
+      <Toaster
+        richColors
+        toastOptions={{
+          style: {
+            marginTop: 400,
+          },
+          className: "class",
+        }}
+      />
       <Box pt="20px">
         <Typography fontSize={25} fontWeight={700}>
           Wait List Details
@@ -163,9 +229,7 @@ const WaitlistDetails = () => {
             color="#FCFCFC"
             fullWidth
             icon={<ForwardToInboxIcon />}
-            handleClick={() => {
-              // navigate(`/rooms/edit/${waitlistDetails._id}`);
-            }}
+            handleClick={handleOpenEmailModal}
           />
         </Box>
       </Box>
@@ -174,6 +238,70 @@ const WaitlistDetails = () => {
       <Box pb={"60px"}>
         <DescriptionCard data={waitlistMessage} />
       </Box>
+      {/* Email Modal */}
+      <Modal
+        open={isEmailModalOpen}
+        onClose={handleCloseEmailModal}
+        aria-labelledby="email-modal-title"
+      >
+        <Box
+          sx={{
+            ...style,
+            width: "60%", 
+            height: "auto", 
+            overflowY: "auto", // This ensures the modal content is scrollable
+          }}
+        >
+          <Typography id="email-modal-title" variant="h6" component="h2">
+            Compose Email
+          </Typography>
+          <TextField
+            label="Subject"
+            fullWidth
+            margin="normal"
+            variant="outlined"
+            value={emailSubject}
+            onChange={(e) => setEmailSubject(e.target.value)}
+          />
+          <TextareaAutosize
+            aria-label="email text"
+            // minRows={10}
+            style={{
+              width: "100%",
+              height: "480px", // Maximum height before scrollbar appears
+              overflow: "auto",
+              marginTop: "8px",
+              marginBottom: "8px",
+              padding: "10px",
+              borderColor: "lightgray",
+              borderRadius: "4px",
+              resize: "vertical", // Allows the user to resize vertically
+            }}
+            value={emailMessage}
+            onChange={(e) => setEmailMessage(e.target.value)}
+          />
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "flex-end",
+              paddingTop: "8px",
+              marginBottom: "0px",
+            }}
+          >
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={handleSendEmail}
+              sx={{ marginRight: "8px" }}
+            >
+              Send
+            </Button>
+            <Button variant="outlined" onClick={handleCloseEmailModal}>
+              Cancel
+            </Button>
+          </Box>
+        </Box>
+      </Modal>
     </Container>
   );
 };
