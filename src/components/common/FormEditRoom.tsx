@@ -25,10 +25,9 @@ const FormEditRoom = ({ type, propertyDetails }: FormProps) => {
   const navigate = useNavigate();
   const { id } = useParams();
   const isSmallScreen = useMediaQuery(Theme.breakpoints.down("sm"));
-  const [dobMain, setDobMain] = React.useState<Dayjs | null>(null);
-
   const [formData, setFormData] =
     React.useState<ApartmentData>(propertyDetails);
+
   React.useEffect(() => {
     if (propertyDetails !== null) {
       setFormData(propertyDetails);
@@ -42,50 +41,26 @@ const FormEditRoom = ({ type, propertyDetails }: FormProps) => {
     // newFormData?.tenants[0]?.occupants = [];
 
     // Update the state with the modified data
-    if (index === 0) {
-      formData.tenants.push({
-        firstName: "",
-        lastName: "",
-        email: "",
-        phoneNumber: "",
-        contractDocId: "",
-        creditReportId: "",
-        dob: dayjs(), // You might want to initialize this with the current date or another default value
-        carModel: [],
-        occupants: [],
-      });
-      const mainTenant = formData.tenants[0];
-      mainTenant?.occupants.push({
-        name: "",
-        dob: "",
-        relationToApplicant: "", // Adjust relation as needed
-      });
 
-      // Update the state with the modified data
-      setFormData((prevData) => ({
-        ...prevData,
-        tenants: [mainTenant], // Update tenants array
-      }));
-    }
+    const mainTenant = formData.tenants[0];
+    mainTenant?.occupants.push({
+      name: "",
+      dob: "",
+      relationToApplicant: "",
+    });
+
+    // Update the state with the modified data
+    setFormData((prevData) => ({
+      ...prevData,
+      tenants: [mainTenant], // Update tenants array
+    }));
+
     handleFieldChange(`tenants.0.occupants.${index}.name`, "");
     handleFieldChange(`tenants.0.occupants.${index}.dob`, "");
     handleFieldChange(`tenants.0.occupants.${index}.relationToApplicant`, "");
   };
 
   const handleCreateVehicle = (index: number) => {
-    if (index === 0) {
-      formData.tenants.push({
-        firstName: "",
-        lastName: "",
-        email: "",
-        phoneNumber: "",
-        contractDocId: "",
-        creditReportId: "",
-        dob: dayjs(), // You might want to initialize this with the current date or another default value
-        carModel: [],
-        occupants: [],
-      });
-    }
     const mainTenant = formData.tenants[0];
     mainTenant?.carModel.push({
       make: "",
@@ -798,7 +773,7 @@ const FormEditRoom = ({ type, propertyDetails }: FormProps) => {
                 />
 
                 {/* 5. Credit Report */}
-                <Box mt={"20px"}>
+                {/* <Box mt={"20px"}>
                   <Typography fontSize={20} fontWeight={700}>
                     {"5. Credit Report"}
                   </Typography>
@@ -811,12 +786,12 @@ const FormEditRoom = ({ type, propertyDetails }: FormProps) => {
                     icon={<PublishIcon />}
                     handleClick={() => {}}
                   />
-                </Box>
+                </Box> */}
 
                 {/* 6. Notes */}
                 <Box mt={"20px"}>
                   <Typography fontSize={20} fontWeight={700}>
-                    {"6. Notes"}
+                    {"5. Notes"}
                   </Typography>
                 </Box>
                 <FormControl>
