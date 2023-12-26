@@ -72,7 +72,7 @@ export const Navigation = () => {
   };
   return (
     // <div>
-        <Box sx={{ display: "flex" }}>
+    <Box sx={{ display: "flex" }}>
       <CssBaseline />
       <AppBar position="absolute" open={open}>
         <Toolbar
@@ -92,6 +92,7 @@ export const Navigation = () => {
           >
             <MenuIcon />
           </IconButton>
+
           <Typography
             component="h1"
             variant="h6"
@@ -99,11 +100,13 @@ export const Navigation = () => {
             noWrap
             sx={{ flexGrow: 1 }}
           ></Typography>
-          <IconButton color="inherit">
-            <Badge badgeContent={4} color="secondary">
-              <NotificationsIcon />
-            </Badge>
-          </IconButton>
+          <Box mr={7}>
+            <img
+              src={"src/assets/whitetranquilitylogo.png"}
+              alt="Tranquility Place"
+              width={200}
+            />
+          </Box>
         </Toolbar>
       </AppBar>
 
@@ -123,6 +126,6 @@ export const Navigation = () => {
         <Divider />
         <List component="nav">{mainListItems}</List>
       </Drawer>
-      </Box>
+    </Box>
   );
 };

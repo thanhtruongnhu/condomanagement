@@ -58,6 +58,12 @@ const columns: GridColDef[] = [
     width: 250,
     editable: false,
   },
+  {
+    field: "rentPrice",
+    headerName: "Rental (CAD)",
+    width: 200,
+    editable: false,
+  },
 ];
 
 function Rooms() {
@@ -116,6 +122,7 @@ function Rooms() {
               "en-US"
             ),
             endDate: new Date(item.contractEndDate).toLocaleDateString("en-US"),
+            rentPrice: `$${item.currentRent}`,
             _id: item._id,
           })
         );
