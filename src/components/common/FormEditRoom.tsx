@@ -20,6 +20,7 @@ import PublishIcon from "@mui/icons-material/Publish";
 import Chip from "./Chip";
 import { ApartmentData } from "../../interfaces/property";
 import ChipNew from "./ChipNew";
+import { Toaster, toast } from "sonner";
 
 const FormEditRoom = ({ type, propertyDetails }: FormProps) => {
   const navigate = useNavigate();
@@ -172,10 +173,27 @@ const FormEditRoom = ({ type, propertyDetails }: FormProps) => {
       );
 
       if (!response.ok) {
-        throw new Error(`HTTP error! Status: ${response.status}`);
+        // throw new Error(`HTTP error! Status: ${response.status}`);
+        console.error("Error updating room data:", `${response.status}`);
+        toast.error(
+          "Oops! There's some error happen while we're updating room info. Please try again later! Thank you 😊",
+          {
+            position: "top-center",
+          }
+        );
+      } else {
+        toast.success("Room info updated successfully!", {
+          position: "top-center",
+        });
       }
     } catch (error) {
       console.error("Error updating room data:", error);
+      toast.error(
+        "Oops! There's some error happen while we're updating room info. Please try again later! Thank you 😊",
+        {
+          position: "top-center",
+        }
+      );
     }
   };
 
@@ -184,6 +202,15 @@ const FormEditRoom = ({ type, propertyDetails }: FormProps) => {
       {propertyDetails && formData ? (
         <LocalizationProvider dateAdapter={AdapterDayjs}>
           <Box mx={"20px"} mb={"40px"}>
+            <Toaster
+              richColors
+              toastOptions={{
+                style: {
+                  marginTop: 400,
+                },
+                className: "class",
+              }}
+            />
             <Box
               mt={2.5}
               borderRadius="15px"

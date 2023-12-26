@@ -89,7 +89,7 @@ const ApplicationDetails = () => {
       if (!response.ok) {
         throw new Error(`HTTP error! Status: ${response.status}`);
       }
-      
+
       console.log("Application removed successfully");
       toast.success("Your application has been successfully removed!", {
         position: "top-center",
@@ -399,9 +399,13 @@ const ApplicationDetails = () => {
         </Box>
 
         <ApplicationInfoCard
-          submissionDate={"11/20/2023"}
+          submissionDate={new Date(
+            applicationDetails.applicationDate
+          ).toLocaleDateString("en-US")}
           openhouseVisit={openhouseVisit}
           setOpenhouseVisit={setOpenhouseVisit}
+          aptTypeId={applicationDetails.aptTypeId}
+          roomId={applicationDetails._id}
         />
 
         <InfoCard title={"1. Personal Info"} data={tenantInfo} />
