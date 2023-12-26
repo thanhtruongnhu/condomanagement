@@ -223,6 +223,7 @@ function Rooms() {
             pageSizeOptions={[100]}
             // checkboxSelection
             disableRowSelectionOnClick
+            onSortModelChange={(model) => setSortModel(model)}
           />
         </form>
       </Box>

@@ -12,7 +12,7 @@ import {
   Switch,
   Typography,
 } from "@mui/material";
-import { DataGrid, GridColDef, GridValueGetterParams } from "@mui/x-data-grid";
+import { DataGrid, GridColDef, GridSortModel, GridValueGetterParams } from "@mui/x-data-grid";
 import {
   Filter,
   CurrentFilterValues,
@@ -61,6 +61,13 @@ const columns: GridColDef[] = [
 function Inventory() {
   const [apartmentData, setApartmentData] = useState<ApartmentData[]>([]);
   const updatedData = [...apartmentData];
+
+  const [sortModel, setSortModel] = useState<GridSortModel>([
+    {
+      field: "type", // Specify the field to sort by
+      sort: "asc", // Specify the sort direction ('asc' or 'desc')
+    },
+  ]);
 
   useEffect(() => {
     const fetchApartmentData = async () => {
@@ -343,6 +350,10 @@ function Inventory() {
                 pageSizeOptions={[100]}
                 // checkboxSelection
                 disableRowSelectionOnClick
+                sortModel={sortModel}
+
+                onSortModelChange={(model) => setSortModel(model)}
+
               />
             </>
           )}
