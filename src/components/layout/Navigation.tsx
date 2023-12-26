@@ -101,8 +101,13 @@ export const Navigation = () => {
             sx={{ flexGrow: 1 }}
           ></Typography>
           <Box mr={7}>
-            <img
+            {/* <img
               src={"src/assets/whitetranquilitylogo.png"}
+              alt="Tranquility Place"
+              width={200}
+            /> */}
+            <img
+              src={import.meta.env.BASE_URL + "whitetranquilitylogo.png"}
               alt="Tranquility Place"
               width={200}
             />
