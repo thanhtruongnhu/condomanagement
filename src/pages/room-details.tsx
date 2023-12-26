@@ -1,13 +1,8 @@
 import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
-import Stack from "@mui/material/Stack";
-// import { useDelete, useShow } from "@refinedev/core";
 import { useParams, useNavigate } from "react-router-dom";
-import Delete from "@mui/icons-material/Delete";
 import Edit from "@mui/icons-material/Edit";
-import Place from "@mui/icons-material/Place";
-import Star from "@mui/icons-material/Star";
-
+import VisibilityIcon from "@mui/icons-material/Visibility";
 import CustomButton from "../components/common/CustomButton";
 import SingleSuitA from "../assets/SingleSuite.jpg";
 import {
@@ -19,14 +14,8 @@ import {
 } from "../interfaces/property";
 import { Button, Container, Grid } from "@mui/material";
 import InfoCard from "../components/common/InfoCard";
-import { CloudDownloadRounded } from "@mui/icons-material";
-import Chip from "../components/common/Chip";
 import { useEffect, useState } from "react";
-import {
-  DataItem,
-  DescriptionCardProps,
-  InfoCardProps,
-} from "../interfaces/common";
+import { DataItem } from "../interfaces/common";
 import formatDate from "../components/common/DateFormatter";
 import DescriptionCard from "../components/common/DescriptionCard";
 import ChipNew from "../components/common/ChipNew";
@@ -84,6 +73,34 @@ const RoomDetails = () => {
 
     fetchApartmentData();
   }, [id]);
+
+  const fetchDocumentPreview = async (creditReportName: string) => {
+    try {
+      const token = localStorage.getItem("token");
+      // Construct the document preview URL
+      const documentPreviewURL = `https://globalsolusap.com/application/document-preview/${creditReportName}`;
+
+      // Fetch document preview using the stored token in the headers
+      const response = await fetch(documentPreviewURL, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+
+      // Assuming the response is a URL string
+      const responseData = await response.json();
+      const documentPreviewURLString = responseData.previewURL;
+
+      // Open the URL in a new tab
+      window.open(documentPreviewURLString, "_blank");
+    } catch (error) {
+      console.error("Error fetching and opening document preview:", error);
+    }
+  };
 
   // Create a separate function to process the apartment data and set state
   const processApartmentData = (data: ApartmentData) => {
@@ -155,22 +172,6 @@ const RoomDetails = () => {
     console.log(`Deleted property with ID: ${id}`);
   };
 
-  const handleDeleteProperty = () => {
-    if (id) {
-      const response = window.confirm(
-        "Are you sure you want to delete this property?"
-      );
-      if (response) {
-        mutate({
-          resource: "properties",
-          id: id,
-        }).then(() => {
-          navigate("/rooms");
-        });
-      }
-    }
-  };
-
   return (
     <Container
       maxWidth="lg"
@@ -235,21 +236,29 @@ const RoomDetails = () => {
       <InfoCard title={"4. Vehicle Info"} data={mockVehicleInfo} />
 
       {/* CreditReportCard */}
-      <Box mt={"30px"} ml={"5px"}>
-        <Typography fontSize={20} fontWeight={700}>
-          {"5. Credit Report"}
-        </Typography>
+      {apartmentData ? (
+        <Box mt={"30px"} ml={"5px"}>
+          <Typography fontSize={20} fontWeight={700}>
+            {"5. Credit Report"}
+          </Typography>
 
-        <Box mt={"20px"}>
-          <CustomButton
-            title={"Download"}
-            backgroundColor="#475BE8"
-            color="#FCFCFC"
-            icon={<CloudDownloadRounded />}
-            handleClick={() => {}}
-          />
+          <Box mt={"20px"}>
+            <CustomButton
+              title={"View"}
+              backgroundColor="#475BE8"
+              color="#FCFCFC"
+              icon={<VisibilityIcon />}
+              handleClick={() =>
+                fetchDocumentPreview(
+                  apartmentData?.tenants[0].creditReport?.documentName
+                )
+              }
+            />
+          </Box>
         </Box>
-      </Box>
+      ) : (
+        ""
+      )}
 
       {/* Notes */}
       <Box mt={"30px"} ml={"5px"}>

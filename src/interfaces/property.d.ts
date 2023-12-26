@@ -66,10 +66,18 @@ export interface Tenant {
   email: string;
   phoneNumber: string;
   contractDocId: string;
-  creditReportId: string;
+  creditReport: CreditReport;
   dob: dayjs;
   carModel: CarModel[];
   occupants: Occupant[];
+}
+
+export interface CreditReport {
+  documentName: string;
+  contentType: string;
+  location: string;
+  fileSize: number;
+  _id: string;
 }
 
 export interface CarModel {
