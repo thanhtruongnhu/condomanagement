@@ -30,6 +30,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { updateToken, clearToken } from "./store/tokenSlice"; // Adjust the path accordingly
 import { selectAptTypeData, updateAptTypeData } from "./store/aptTypeSlice";
 import { Navigation } from "./components/layout/Navigation";
+import Welcome from "./pages/welcome";
 
 const drawerWidth: number = 240;
 
@@ -149,6 +150,7 @@ export default function Dashboard() {
             <Toolbar />
             <Routes>
               {/* <Route path="/dashboard" element={<Dash />} /> */}
+              <Route path="/" element={<Welcome />} />
               <Route path="/rooms" element={<Rooms />} />
               <Route path="/inventory" element={<Inventory />} />
               <Route path="/applications" element={<Applications />} />
