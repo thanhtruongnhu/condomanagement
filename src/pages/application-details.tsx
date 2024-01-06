@@ -9,8 +9,13 @@ import { Room } from "../interfaces/property";
 import {
   Button,
   Container,
+  FormControl,
+  FormHelperText,
   Grid,
+  MenuItem,
   Modal,
+  Select,
+  Stack,
   TextField,
   TextareaAutosize,
 } from "@mui/material";
@@ -24,12 +29,17 @@ import { Address, ApplicationData } from "../interfaces/application";
 import formatDate from "../components/common/DateFormatter";
 import { DataItem } from "../interfaces/common";
 import { Toaster, toast } from "sonner";
+import AddCircleIcon from "@mui/icons-material/AddCircle";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import {
   initialApplicationMessage,
   initialApplicationSubject,
   modalStyle,
 } from "../components/common/PredefinedMessagesandThemes";
+import { roomList } from "../components/common/Constants";
+import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
+import dayjs from "dayjs";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 
 function booleanToYesNo(value: boolean): string {
   return value ? "Yes" : "No";
@@ -263,6 +273,7 @@ const ApplicationDetails = () => {
   // Call the processing function when apartmentData changes
   useEffect(() => {
     if (applicationDetails) {
+      console.log("HERE::", applicationDetails);
       processApplicationData(applicationDetails);
     }
   }, [applicationDetails]);
@@ -327,6 +338,60 @@ const ApplicationDetails = () => {
     handleCloseEmailModal();
   };
 
+  const [isAddTenantModal, setAddTenantModal] = useState(false);
+  const [apartmentNumber, setApartmentNumber] = useState("");
+  const [contractStartDate, setContractStartDate] = useState("");
+  const [contractEndDate, setContractEndDate] = useState("");
+  const [currentRent, setCurrentRent] = useState("");
+  const [depositAmount, setDepositAmount] = useState("");
+
+  const handleOpenAddTenantModal = () => setAddTenantModal(true);
+  const handleCloseAddTenantModal = () => setAddTenantModal(false);
+
+  const handleAddTenant = async () => {
+    const payload = {
+      applicationId: id,
+      apartmentNumber: apartmentNumber,
+      apartmentTypeId: applicationDetails.aptTypeId,
+      contractStartDate: contractStartDate,
+      contractEndDate: contractEndDate,
+      currentRent: currentRent,
+      depositAmount: depositAmount,
+    };
+
+    const token = localStorage.getItem("token");
+
+    // Replace with your API endpoint
+    const response = await fetch(
+      "https://globalsolusap.com/application/assignTenant",
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(payload),
+      }
+    );
+
+    if (response.ok) {
+      console.log("New tenant added successfully!");
+      toast.success("New tenant added successfully!", {
+        position: "top-center",
+      });
+    } else {
+      console.error("Failed to add this applicant to the tenant list");
+      toast.error(
+        "Oops! There's some error happen while we're adding this applicant to the tenant list. Please try again later! Thank you 😊",
+        {
+          position: "top-center",
+        }
+      );
+    }
+
+    handleCloseAddTenantModal();
+  };
+
   return (
     applicationDetails && (
       <Container
@@ -370,6 +435,16 @@ const ApplicationDetails = () => {
               marginLeft={"20px"}
             />
           </Grid>
+          <Box mr={"10px"}>
+            <CustomButton
+              title={"Tenant"}
+              backgroundColor="#40cf38"
+              color="#FCFCFC"
+              fullWidth
+              icon={<AddCircleIcon />}
+              handleClick={handleOpenAddTenantModal}
+            />
+          </Box>
           <Box mr={"10px"}>
             <CustomButton
               title={"Delete"}
@@ -500,6 +575,164 @@ const ApplicationDetails = () => {
               </Button>
             </Box>
           </Box>
+        </Modal>
+
+        {/* Add tenant Modal */}
+        <Modal
+          open={isAddTenantModal}
+          onClose={handleCloseEmailModal}
+          aria-labelledby="email-modal-title"
+        >
+          <LocalizationProvider dateAdapter={AdapterDayjs}>
+            <Box
+              sx={{
+                ...style,
+                width: "30%",
+                height: "auto",
+                overflowY: "auto", // This ensures the modal content is scrollable
+              }}
+            >
+              <Typography id="email-modal-title" variant="h6" component="h2">
+                Add this applicant to tenant list
+              </Typography>
+              <FormControl sx={{ flex: 1 }} fullWidth>
+                <FormHelperText
+                  sx={{
+                    fontWeight: 500,
+                    margin: "10px 0",
+                    fontSize: 16,
+                    color: "#11142d",
+                  }}
+                >
+                  Apartment Number
+                </FormHelperText>
+                <Select
+                  required
+                  id="province"
+                  value={apartmentNumber}
+                  onChange={(e) => setApartmentNumber(e.target.value)}
+                  variant="outlined"
+                  color="info"
+                >
+                  {roomList.map((roomNumber, index) => (
+                    <MenuItem key={index} value={roomNumber}>
+                      {roomNumber}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+
+              <Stack gap={4} marginTop={2} direction="row">
+                <Stack flex={1} direction="column">
+                  <FormControl>
+                    <FormHelperText
+                      sx={{
+                        fontWeight: 500,
+                        margin: "10px 0",
+                        fontSize: 16,
+                        color: "#11142d",
+                      }}
+                    >
+                      Contract Start Date
+                    </FormHelperText>
+                  </FormControl>
+                  <DatePicker
+                    defaultValue={dayjs(contractStartDate)}
+                    onChange={(newValue) =>
+                      setContractStartDate(newValue ? newValue.format() : "")
+                    }
+                  />
+                </Stack>
+                <Stack flex={1} direction="column">
+                  <FormControl>
+                    <FormHelperText
+                      sx={{
+                        fontWeight: 500,
+                        margin: "10px 0",
+                        fontSize: 16,
+                        color: "#11142d",
+                      }}
+                    >
+                      Contract End Date
+                    </FormHelperText>
+                  </FormControl>
+                  <DatePicker
+                    defaultValue={dayjs(contractEndDate)}
+                    onChange={(newValue) =>
+                      setContractEndDate(newValue ? newValue.format() : "")
+                    }
+                    disablePast
+                  />
+                </Stack>
+              </Stack>
+
+              <Stack gap={4} marginTop={2} direction="row">
+                <FormControl sx={{ flex: 1 }} fullWidth>
+                  <FormHelperText
+                    sx={{
+                      fontWeight: 500,
+                      margin: "10px 0",
+                      fontSize: 16,
+                      color: "#11142d",
+                    }}
+                  >
+                    Rental $
+                  </FormHelperText>
+                  <TextField
+                    fullWidth
+                    required
+                    id="outlined-basic"
+                    color="info"
+                    variant="outlined"
+                    value={currentRent}
+                    onChange={(e) => setCurrentRent(e.target.value)}
+                  />
+                </FormControl>
+                <FormControl sx={{ flex: 1 }} fullWidth>
+                  <FormHelperText
+                    sx={{
+                      fontWeight: 500,
+                      margin: "10px 0",
+                      fontSize: 16,
+                      color: "#11142d",
+                    }}
+                  >
+                    Deposit $
+                  </FormHelperText>
+                  <TextField
+                    fullWidth
+                    required
+                    id="outlined-basic"
+                    color="info"
+                    variant="outlined"
+                    value={depositAmount}
+                    onChange={(e) => setDepositAmount(e.target.value)}
+                  />
+                </FormControl>
+              </Stack>
+
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "flex-end",
+                  paddingTop: "8px",
+                  marginTop: "50px",
+                }}
+              >
+                <Button
+                  variant="contained"
+                  color="primary"
+                  onClick={handleAddTenant}
+                  sx={{ marginRight: "8px" }}
+                >
+                  Confirm
+                </Button>
+                <Button variant="outlined" onClick={handleCloseAddTenantModal}>
+                  Cancel
+                </Button>
+              </Box>
+            </Box>
+          </LocalizationProvider>
         </Modal>
       </Container>
     )

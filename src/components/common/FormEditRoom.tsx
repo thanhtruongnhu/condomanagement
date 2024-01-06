@@ -714,7 +714,6 @@ const FormEditRoom = ({ type, propertyDetails }: FormProps) => {
                           direction={isSmallScreen ? "column" : "row"}
                           gap={4}
                         >
-                          {/* DOB main tenant */}
                           <FormControl sx={{ flex: 1 }} fullWidth>
                             <FormHelperText
                               sx={{
