@@ -63,9 +63,9 @@ const RoomDetails = () => {
 
         const data = await response.json();
         setApartmentData(data);
-        if (data.creditReport) {
-          setDocumentName(data.creditReport.documentName);
-        }
+        // if (data.creditReport) {
+        //   setDocumentName(data.creditReport.documentName);
+        // }
       } catch (error) {
         console.error("Error fetching apartment data:", error);
       }
@@ -236,7 +236,7 @@ const RoomDetails = () => {
       <InfoCard title={"4. Vehicle Info"} data={mockVehicleInfo} />
 
       {/* CreditReportCard */}
-      {apartmentData ? (
+      {/* {apartmentData ? (
         <Box mt={"30px"} ml={"5px"}>
           <Typography fontSize={20} fontWeight={700}>
             {"5. Credit Report"}
@@ -258,12 +258,12 @@ const RoomDetails = () => {
         </Box>
       ) : (
         ""
-      )}
+      )} */}
 
       {/* Notes */}
       <Box mt={"30px"} ml={"5px"}>
         <Typography fontSize={20} fontWeight={700}>
-          {"6. Notes"}
+          {"5. Notes"}
         </Typography>
         <Box pb={"60px"}>
           <DescriptionCard data={notes} />
