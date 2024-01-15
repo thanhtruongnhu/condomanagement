@@ -29,6 +29,10 @@ const FormEditRoom = ({ type, propertyDetails }: FormProps) => {
   const [formData, setFormData] =
     React.useState<ApartmentData>(propertyDetails);
 
+    const handleCancel = () => {
+      navigate(`/rooms/show/${id}`);
+    };
+
   React.useEffect(() => {
     if (propertyDetails !== null) {
       setFormData(propertyDetails);
@@ -869,6 +873,7 @@ const FormEditRoom = ({ type, propertyDetails }: FormProps) => {
                     title={"Cancel"}
                     backgroundColor="#e84747"
                     color="#fcfcfc"
+                    handleClick={handleCancel}
                   />
                 </Stack>
               </form>
