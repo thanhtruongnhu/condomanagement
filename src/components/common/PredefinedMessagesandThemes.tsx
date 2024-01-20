@@ -26,13 +26,13 @@ Best regards,
 
 Tranquility Place PEI
 Peace Property Management Ltd.
-Cell: (902) 314 - 6827
+Cell: (902) 314 - 6827 or (902) 393 - 2826
 Email: tranquilityplacepei@gmail.com
 Website: https://tranquilityplacepei.ca`;
 
 export const initialInquirySubject = "Response to Your Inquiry About Our Suite";
 
-export const initialInquiryMessage = `Hi <First Name>,\n\nThank you for your interest in our suites at Tranquility Place PEI. My name is Kelly, a member of the property management team at Tranquility Place. I'm pleased to address your queries and assist you in the application process.\n\n<Replace with your message...>\n\nShould you have any more questions or wish to schedule a viewing, please feel free to contact me. We look forward to possibly having you as part of our community!\n\n\nBest regards,\n\nTranquility Place PEI\nPeace Property Management  Ltd.\nCell: (902) 314 - 6827\nEmail: tranquilityplacepei@gmail.com\nWebsite: https://tranquilityplacepei.ca`;
+export const initialInquiryMessage = `Hi <First Name>,\n\nThank you for your interest in our suites at Tranquility Place PEI. My name is Kelly, a member of the property management team at Tranquility Place. I'm pleased to address your queries and assist you in the application process.\n\n<Replace with your message...>\n\nShould you have any more questions or wish to schedule a viewing, please feel free to contact me. We look forward to possibly having you as part of our community!\n\n\nBest regards,\n\nTranquility Place PEI\nPeace Property Management  Ltd.\nCell: (902) 314 - 6827 or (902) 393 - 2826\nEmail: tranquilityplacepei@gmail.com\nWebsite: https://tranquilityplacepei.ca`;
 
 export const initialWaitlistSubject =
   "Welcome to the Tranquility Place Waitlist!";
@@ -53,7 +53,7 @@ Warm regards,
 
 Tranquility Place PEI
 Peace Property Management Ltd.
-Cell: (902) 314 - 6827
+Cell: (902) 314 - 6827 or (902) 393 - 2826
 Email: tranquilityplacepei@gmail.com
 Website: https://tranquilityplacepei.ca`;
 
