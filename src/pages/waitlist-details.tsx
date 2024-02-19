@@ -57,6 +57,7 @@ const WaitlistDetails = () => {
         "Last Name": data.lastName,
         "Email Address": data.email,
         "Phone Number": data.phoneNumber,
+        "Desired move-in date": formatDate(data.desiredDate),
       },
     ];
 
@@ -247,8 +248,8 @@ const WaitlistDetails = () => {
         <Box
           sx={{
             ...style,
-            width: "60%", 
-            height: "auto", 
+            width: "60%",
+            height: "auto",
             overflowY: "auto", // This ensures the modal content is scrollable
           }}
         >

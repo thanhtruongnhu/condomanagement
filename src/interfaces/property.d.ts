@@ -190,4 +190,5 @@ export interface WaitlistData {
   waitlistedDate: string;
   _id: string;
   aptTypeId: string;
+  desiredDate: string;
 }
